@@ -9,5 +9,6 @@ package Backend;
  * @author ahmed
  */
 public class User {
+    private String Password;
     
 }
