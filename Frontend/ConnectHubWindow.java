@@ -4,6 +4,17 @@
  */
 package Frontend;
 
+import Backend.ContentService;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+
 /**
  *
  * @author Jana
@@ -13,8 +24,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     /**
      * Creates new form ConnectHubWindow
      */
+    private String selectedImagePath;
+    private ContentService contentService;
+    
     public ConnectHubWindow() {
         initComponents();
+       // contentService = ew ContentService("");
     }
 
     /**
@@ -40,7 +55,38 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         kGradientPanel4 = new keeptoo.KGradientPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        addPostButton = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane(StoriesPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        StoriesPanel = new javax.swing.JPanel();
+        storyPanel1 = new javax.swing.JPanel();
+        viewStory1 = new javax.swing.JLabel();
+        storyPanel2 = new javax.swing.JPanel();
+        viewStory = new javax.swing.JLabel();
+        storyPanel = new javax.swing.JPanel();
+        viewStory2 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
         kGradientPanel3 = new keeptoo.KGradientPanel();
+        postStoryButton = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        storyCaptionTextField = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        uploadStoryButton = new javax.swing.JButton();
+        imagePreview = new javax.swing.JLabel();
+        kGradientPanel5 = new keeptoo.KGradientPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        uploadPostButton = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
+        ImagePreview2 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        postCaptionTextField = new javax.swing.JTextField();
+        postPostButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -62,6 +108,11 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         usernameField.setBackground(new java.awt.Color(255, 255, 255));
         usernameField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         usernameField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        usernameField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usernameFieldActionPerformed(evt);
+            }
+        });
 
         jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -92,35 +143,37 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(116, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5)
-                    .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(78, 78, 78)
-                        .addComponent(jLabel3))
-                    .addComponent(jLabel4)
-                    .addComponent(jPasswordField1)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(90, 90, 90))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel5)
+                            .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                            .addComponent(jLabel4)
+                            .addComponent(jPasswordField1)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(90, 90, 90))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(176, 176, 176))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(121, 121, 121)
                 .addComponent(jLabel3)
-                .addGap(27, 27, 27)
+                .addGap(33, 33, 33)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(28, 28, 28)
                 .addComponent(jButton2)
-                .addContainerGap(298, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         kGradientPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(462, 0, -1, 530));
@@ -133,7 +186,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 0, 51));
         jLabel1.setText("ConnectHub");
-        kGradientPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 110, 320, 60));
+        kGradientPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, 320, 60));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("Welcome to");
@@ -159,46 +212,554 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jTabbedPane2.addTab("tab1", kGradientPanel1);
 
         kGradientPanel4.setkEndColor(new java.awt.Color(51, 0, 51));
-        kGradientPanel4.setkStartColor(new java.awt.Color(255, 153, 255));
+        kGradientPanel4.setkStartColor(new java.awt.Color(51, 0, 51));
+        kGradientPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        javax.swing.GroupLayout kGradientPanel4Layout = new javax.swing.GroupLayout(kGradientPanel4);
-        kGradientPanel4.setLayout(kGradientPanel4Layout);
-        kGradientPanel4Layout.setHorizontalGroup(
-            kGradientPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 890, Short.MAX_VALUE)
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(51, 0, 51)));
+
+        addPostButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
+        addPostButton.setText("jLabel9");
+        addPostButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                addPostButtonMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(297, 297, 297)
+                .addComponent(addPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(309, Short.MAX_VALUE))
         );
-        kGradientPanel4Layout.setVerticalGroup(
-            kGradientPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 525, Short.MAX_VALUE)
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(addPostButton))
         );
+
+        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 60, 660, 460));
+
+        StoriesPanel.setBackground(new java.awt.Color(51, 0, 51));
+
+        storyPanel1.setBackground(new java.awt.Color(51, 0, 51));
+
+        viewStory1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
+        viewStory1.setText("jLabel9");
+        viewStory1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                viewStory1MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout storyPanel1Layout = new javax.swing.GroupLayout(storyPanel1);
+        storyPanel1.setLayout(storyPanel1Layout);
+        storyPanel1Layout.setHorizontalGroup(
+            storyPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, storyPanel1Layout.createSequentialGroup()
+                .addContainerGap(26, Short.MAX_VALUE)
+                .addComponent(viewStory1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
+        );
+        storyPanel1Layout.setVerticalGroup(
+            storyPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storyPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(viewStory1)
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
+        StoriesPanel.add(storyPanel1);
+
+        storyPanel2.setBackground(new java.awt.Color(51, 0, 51));
+
+        viewStory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
+        viewStory.setText("jLabel9");
+        viewStory.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                viewStoryMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout storyPanel2Layout = new javax.swing.GroupLayout(storyPanel2);
+        storyPanel2.setLayout(storyPanel2Layout);
+        storyPanel2Layout.setHorizontalGroup(
+            storyPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storyPanel2Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(viewStory, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+        storyPanel2Layout.setVerticalGroup(
+            storyPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storyPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(viewStory)
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
+        StoriesPanel.add(storyPanel2);
+
+        storyPanel.setBackground(new java.awt.Color(51, 0, 51));
+
+        viewStory2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
+        viewStory2.setText("jLabel9");
+        viewStory2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                viewStory2MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout storyPanelLayout = new javax.swing.GroupLayout(storyPanel);
+        storyPanel.setLayout(storyPanelLayout);
+        storyPanelLayout.setHorizontalGroup(
+            storyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storyPanelLayout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(viewStory2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+        storyPanelLayout.setVerticalGroup(
+            storyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storyPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(viewStory2)
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
+        StoriesPanel.add(storyPanel);
+
+        jScrollPane1.setViewportView(StoriesPanel);
+
+        kGradientPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, -6, 510, 70));
+
+        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 204, 255));
+        jLabel9.setText("Post a New Story");
+        jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel9MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addComponent(jLabel9)
+                .addGap(16, 16, 16))
+        );
+
+        kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 160, 60));
 
         jTabbedPane2.addTab("tab3", kGradientPanel4);
 
+        jPanel4.setBackground(new java.awt.Color(51, 0, 51));
+
         kGradientPanel3.setkEndColor(new java.awt.Color(51, 0, 51));
-        kGradientPanel3.setkStartColor(new java.awt.Color(255, 153, 255));
+        kGradientPanel3.setkStartColor(new java.awt.Color(255, 204, 255));
+
+        postStoryButton.setBackground(new java.awt.Color(255, 255, 255));
+        postStoryButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        postStoryButton.setForeground(new java.awt.Color(51, 0, 51));
+        postStoryButton.setText("Post Story");
+        postStoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                postStoryButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Welcome_to_ConnectHub-removebg-preview.png"))); // NOI18N
+        jLabel11.setText("jLabel11");
 
         javax.swing.GroupLayout kGradientPanel3Layout = new javax.swing.GroupLayout(kGradientPanel3);
         kGradientPanel3.setLayout(kGradientPanel3Layout);
         kGradientPanel3Layout.setHorizontalGroup(
             kGradientPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 890, Short.MAX_VALUE)
+            .addGroup(kGradientPanel3Layout.createSequentialGroup()
+                .addGroup(kGradientPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(kGradientPanel3Layout.createSequentialGroup()
+                        .addGap(115, 115, 115)
+                        .addComponent(postStoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(kGradientPanel3Layout.createSequentialGroup()
+                        .addGap(75, 75, 75)
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
         kGradientPanel3Layout.setVerticalGroup(
             kGradientPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 525, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel3Layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addComponent(postStoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(64, 64, 64))
         );
 
-        jTabbedPane2.addTab("tab2", kGradientPanel3);
+        storyCaptionTextField.setBackground(new java.awt.Color(51, 0, 51));
+        storyCaptionTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        storyCaptionTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(255, 204, 255)));
+        storyCaptionTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                storyCaptionTextFieldActionPerformed(evt);
+            }
+        });
 
-        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 890, 560));
+        jLabel7.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 204, 255));
+        jLabel7.setText("Add Caption:");
+
+        jLabel8.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 204, 255));
+        jLabel8.setText("Upload Image:");
+
+        jLabel10.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 0, 2, new java.awt.Color(255, 204, 255)));
+
+        uploadStoryButton.setBackground(new java.awt.Color(255, 255, 255));
+        uploadStoryButton.setForeground(new java.awt.Color(51, 0, 51));
+        uploadStoryButton.setText("Upload");
+        uploadStoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadStoryButtonActionPerformed(evt);
+            }
+        });
+
+        imagePreview.setBackground(new java.awt.Color(255, 204, 255));
+        imagePreview.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        imagePreview.setForeground(new java.awt.Color(255, 204, 255));
+        imagePreview.setText("No image selected");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(storyCaptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7)))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(uploadStoryButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(imagePreview, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(216, 216, 216)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(kGradientPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(kGradientPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel8)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(uploadStoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePreview, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(storyCaptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(77, 77, 77))
+        );
+
+        jTabbedPane2.addTab("tab4", jPanel4);
+
+        kGradientPanel5.setkEndColor(new java.awt.Color(255, 204, 255));
+        kGradientPanel5.setkStartColor(new java.awt.Color(51, 0, 51));
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel12.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel12.setText("Upload Image");
+
+        uploadPostButton.setBackground(new java.awt.Color(51, 0, 51));
+        uploadPostButton.setForeground(new java.awt.Color(255, 255, 255));
+        uploadPostButton.setText("Upload");
+        uploadPostButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadPostButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel13.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 2, 0, 0, new java.awt.Color(51, 0, 51)));
+
+        ImagePreview2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        ImagePreview2.setForeground(new java.awt.Color(51, 0, 51));
+        ImagePreview2.setText("No image selected");
+
+        jLabel15.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel15.setText("Add Caption:");
+
+        postCaptionTextField.setBackground(new java.awt.Color(255, 255, 255));
+        postCaptionTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        postCaptionTextField.setForeground(new java.awt.Color(51, 0, 51));
+        postCaptionTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        postCaptionTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                postCaptionTextFieldActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(200, 200, 200)
+                .addComponent(jLabel12)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap(86, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(uploadPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(177, 177, 177))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(ImagePreview2, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(105, 105, 105))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(postCaptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel15))
+                        .addGap(82, 82, 82))))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(uploadPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ImagePreview2, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                .addGap(45, 45, 45)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(postCaptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(123, Short.MAX_VALUE))
+        );
+
+        postPostButton.setBackground(new java.awt.Color(255, 255, 255));
+        postPostButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        postPostButton.setForeground(new java.awt.Color(51, 0, 51));
+        postPostButton.setText("Add New Post");
+        postPostButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                postPostButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout kGradientPanel5Layout = new javax.swing.GroupLayout(kGradientPanel5);
+        kGradientPanel5.setLayout(kGradientPanel5Layout);
+        kGradientPanel5Layout.setHorizontalGroup(
+            kGradientPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel5Layout.createSequentialGroup()
+                .addGap(48, 48, 48)
+                .addComponent(postPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        kGradientPanel5Layout.setVerticalGroup(
+            kGradientPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel5Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(postPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(87, 87, 87))
+        );
+
+        jTabbedPane2.addTab("tab4", kGradientPanel5);
+
+        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 890, 560));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
+        jTabbedPane2.setSelectedIndex(2);
+    }//GEN-LAST:event_jLabel9MouseClicked
+
+    private void viewStory2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStory2MouseClicked
+        displayStoryDetails detailsWindow = new displayStoryDetails();
+        detailsWindow.setVisible(true);
+    }//GEN-LAST:event_viewStory2MouseClicked
+
+    private void viewStoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStoryMouseClicked
+        displayStoryDetails detailsWindow = new displayStoryDetails();
+        detailsWindow.setVisible(true);
+    }//GEN-LAST:event_viewStoryMouseClicked
+
+    private void viewStory1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStory1MouseClicked
+        displayStoryDetails detailsWindow = new displayStoryDetails();
+        detailsWindow.setVisible(true);
+    }//GEN-LAST:event_viewStory1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         jTabbedPane2.setSelectedIndex(1);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void usernameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_usernameFieldActionPerformed
+
+    private void storyCaptionTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_storyCaptionTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_storyCaptionTextFieldActionPerformed
+
+    private void uploadStoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadStoryButtonActionPerformed
+        uploadImageStory();
+    }//GEN-LAST:event_uploadStoryButtonActionPerformed
+
+    private void postStoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postStoryButtonActionPerformed
+        try {
+            postStory();
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectHubWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_postStoryButtonActionPerformed
+
+    private void addPostButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addPostButtonMouseClicked
+        jTabbedPane2.setSelectedIndex(3);
+    }//GEN-LAST:event_addPostButtonMouseClicked
+
+    private void uploadPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadPostButtonActionPerformed
+        uploadImagePost();
+    }//GEN-LAST:event_uploadPostButtonActionPerformed
+
+    private void postCaptionTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postCaptionTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_postCaptionTextFieldActionPerformed
+
+    private void postPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postPostButtonActionPerformed
+        try {
+            postPost();
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectHubWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_postPostButtonActionPerformed
+
+        private void uploadImageStory() 
+        {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+            // Filter for image files only (jpg, png)
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                selectedImagePath = selectedFile.getAbsolutePath();
+                imagePreview.setText(""); // Clear the "No image selected" text
+
+                // Display the image in the label (resized for preview)
+                ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
+                imagePreview.setIcon(icon);
+            }
+        }
+        private void uploadImagePost() 
+        {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+            // Filter for image files only (jpg, png)
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                selectedImagePath = selectedFile.getAbsolutePath();
+                ImagePreview2.setText(""); // Clear the "No image selected" text
+
+                // Display the image in the label (resized for preview)
+                ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
+                ImagePreview2.setIcon(icon);
+            }
+        }
+        
+        
+        private void postStory() throws IOException {
+        String caption = storyCaptionTextField.getText().trim();
+
+        if (selectedImagePath == null || selectedImagePath.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please upload an image for the story.");
+            return;
+        }
+
+        // Call createStory method from ContentService
+        contentService.createStory("userId", caption, selectedImagePath);
+        JOptionPane.showMessageDialog(this, "Story posted successfully!");
+        // Clear inputs
+        storyCaptionTextField.setText("");
+        imagePreview.setIcon(null);
+        imagePreview.setText("No image selected");
+        selectedImagePath = null;
+       }
+        private void postPost() throws IOException {
+        String caption = postCaptionTextField.getText().trim();
+
+        if (selectedImagePath == null || selectedImagePath.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please upload an image for the Post.");
+            return;
+        }
+
+        // Call createStory method from ContentService
+        contentService.createStory("userId", caption, selectedImagePath);
+        JOptionPane.showMessageDialog(this, "Post added successfully!");
+        // Clear inputs
+        storyCaptionTextField.setText("");
+        imagePreview.setIcon(null);
+        imagePreview.setText("No image selected");
+        selectedImagePath = null;
+       }
+        
+        
     /**
      * @param args the command line arguments
      */
@@ -235,20 +796,51 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ImagePreview2;
+    private javax.swing.JPanel StoriesPanel;
+    private javax.swing.JLabel addPostButton;
+    private javax.swing.JLabel imagePreview;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPasswordField jPasswordField1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane2;
     private keeptoo.KGradientPanel kGradientPanel1;
     private keeptoo.KGradientPanel kGradientPanel2;
     private keeptoo.KGradientPanel kGradientPanel3;
     private keeptoo.KGradientPanel kGradientPanel4;
+    private keeptoo.KGradientPanel kGradientPanel5;
+    private javax.swing.JTextField postCaptionTextField;
+    private javax.swing.JButton postPostButton;
+    private javax.swing.JButton postStoryButton;
+    private javax.swing.JTextField storyCaptionTextField;
+    private javax.swing.JPanel storyPanel;
+    private javax.swing.JPanel storyPanel1;
+    private javax.swing.JPanel storyPanel2;
+    private javax.swing.JButton uploadPostButton;
+    private javax.swing.JButton uploadStoryButton;
     private javax.swing.JTextField usernameField;
+    private javax.swing.JLabel viewStory;
+    private javax.swing.JLabel viewStory1;
+    private javax.swing.JLabel viewStory2;
     // End of variables declaration//GEN-END:variables
 }
