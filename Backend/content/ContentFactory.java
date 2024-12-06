@@ -1,5 +1,6 @@
 package Backend.content;
 
+import Backend.content.Content;
 import org.json.JSONObject;
 import java.time.LocalDateTime;
 

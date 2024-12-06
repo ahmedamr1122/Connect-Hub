@@ -4,6 +4,7 @@
  */
 package Backend.content;
 
+import Backend.content.Content;
 import java.time.LocalDateTime;
 
 /**

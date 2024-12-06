@@ -2,6 +2,7 @@ package Backend.user;
 
 import Backend.content.Post;
 import Backend.content.Story;
+import Backend.friends.FriendRequest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,7 +24,8 @@ public class FileManagement {
     }
 
     // load users from a JSON file
-    public List<User> loadUsers(String filePath) {
+    public static List<User> loadUsers(String filePath) {
+
         List<User> users = new ArrayList<>();
         try {
             File file = new File(filePath);
@@ -115,8 +117,29 @@ public class FileManagement {
                 }
                 obj.put("Story", storyArray);
 
+                // Add the sent requests
+                JSONArray sentRequestArray = new JSONArray();
+                for (FriendRequest request : user.getSentRequests()) {
+                    JSONObject sentObj = new JSONObject();
+                    sentObj.put("receiverId", request.getReceiver());
+                    sentObj.put("status", request.getStatus().toString());
+                    sentRequestArray.put(sentObj);
+                }
+                obj.put("sentRequest", sentRequestArray);
+                
+                // Add the received requests
+                JSONArray receiveRequestArray = new JSONArray();
+                for (FriendRequest request : user.getReceivedRequests()) {
+                    JSONObject receivedObj = new JSONObject();
+                    receivedObj.put("senderId", request.getSender());
+                    receivedObj.put("status", request.getStatus().toString());
+                    receiveRequestArray.put(receivedObj);
+                }
+                obj.put("receivedRequest", receiveRequestArray);
+
                 // Add the user object to the json array
                 jsonArray.put(obj);
+
             }
 
             // Write array contents into the file
