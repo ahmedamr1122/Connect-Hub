@@ -103,6 +103,10 @@ public class User {
     public List<Story> getStories() {
         return stories;
     }
+
+    public void setPassword(String password) {
+        this.password = PasswordHashing.hashedPass(password);
+    }
     
 
     public void setBio(String bio) {
