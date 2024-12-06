@@ -1,14 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Backend.user;
 
 import java.time.LocalDate;
 import java.util.regex.Pattern;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 /**
  *
@@ -57,7 +51,6 @@ public class Validations {
         long years = ChronoUnit.YEARS.between(date, currentDate);
         if (years > 10) {
             return true;
-
         }
         return false;
     }
@@ -82,4 +75,33 @@ public class Validations {
         return true;
     }
 
+    // Validate bio length
+    public void validateBio(String bio) {
+        if (bio == null || bio.trim().isEmpty()) {
+            throw new IllegalArgumentException("Bio cannot be empty.");
+        }
+        if (bio.length() > 150) {
+            throw new IllegalArgumentException("Bio cannot exceed 150 characters.");
+        }
+    }
+
+    // Validate photo path
+    public void validatePhotoPath(String photoPath) {
+        if (photoPath == null || photoPath.trim().isEmpty()) {
+            throw new IllegalArgumentException("Photo path cannot be empty.");
+        }
+        if (!photoPath.matches(".*\\.(jpg|jpeg|png|gif)$")) {
+            throw new IllegalArgumentException("Invalid file type for photo. Only .jpg or .png files are allowed.");
+        }
+    }
+
+    // Validate password (minimum length only)
+    public void validatePassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty.");
+        }
+        if (password.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long.");
+        }
+    }
 }

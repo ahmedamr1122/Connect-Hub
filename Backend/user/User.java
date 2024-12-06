@@ -104,6 +104,10 @@ public class User {
         return stories;
     }
 
+    public void setCoverPhoto(String coverPhoto) {
+        this.coverPhoto = coverPhoto;
+    }
+    
     public void setPassword(String password) {
         this.password = PasswordHashing.hashedPass(password);
     }
