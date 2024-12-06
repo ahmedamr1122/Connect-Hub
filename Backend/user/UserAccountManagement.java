@@ -5,14 +5,14 @@ import java.util.List;
 
 public class UserAccountManagement{
 
-    private List<User> users;
+    private static List<User> users;
 
 
     public UserAccountManagement() {
         this.users = FileManagement.loadUsers("Users.json");
     }
 
-    public List<User> getUsers() {
+    public static List<User> getUsers() {
         return users;
     }
 

@@ -8,6 +8,6 @@ public interface FriendManager {
     void sendFriendRequest(User sender, User receiver);
     void respondToFriendRequest(User sender, User receiver, RequestStatus response);
     void removeFriend(User sender, User friend);
-    //List<User> suggestFriends(User user);
+    List<User> suggestFriends(User user, List<User> users);
     
 }
