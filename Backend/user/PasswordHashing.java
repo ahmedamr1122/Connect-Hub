@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class PasswordHashing {
 
-    public String hashedPass(String password) {
+    public static String hashedPass(String password) {
         try {
             //Chooses Algorithm SHA-256
             MessageDigest transform = MessageDigest.getInstance("SHA-256");

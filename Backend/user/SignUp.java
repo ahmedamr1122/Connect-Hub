@@ -12,17 +12,19 @@ import java.util.List;
  *
  * @author ahmed
  */
-public class SignUp extends UserAccountManagement{
-    
+public class SignUp extends UserAccountManagement {
+
+    private ContainUser CU;
+
     // Method to Sign up
     public User signup(String email, String username, String password, LocalDate dateOfBirth) {
+        if (!CU.containEmail(email) || !CU.containUserName(username)) {
+            User newUser = new User(super.generateUserId(), email, username, PasswordHashing.hashedPass(password), dateOfBirth, Status.ONLINE, "", "", "");
+            super.getUsers().add(newUser);
+            return newUser;
+        }
+        return null;
 
-        List<User> friends = new ArrayList<>();
-        List<User> Blocked = new ArrayList<>();
-        User newUser = new User(super.generateUserId(), email, username, password, dateOfBirth, Status.ONLINE,"bio","default","default");
-        super.getUsers().add(newUser);
-        return newUser;
-        
     }
-  
+
 }
