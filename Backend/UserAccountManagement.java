@@ -11,24 +11,13 @@ import Backend.User;
 import java.time.LocalDate;
 import java.util.List;
 
-<<<<<<< HEAD
 public class UserAccountManagement implements IUserAccountManagement{
     private List<User> users;
 
-=======
-public class UserAccountManagement {
-    private List<User> users;
-
-    public List<User> getUsers() {
-        return users;
-    }
-
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
     public UserAccountManagement() {
         this.users = new ArrayList<>();
     }
 
-<<<<<<< HEAD
     // Method to sign up a new user
     @Override
     public User signup(String email, String username, String password, LocalDate dateOfBirth) {
@@ -55,56 +44,6 @@ public class UserAccountManagement {
 
     // Method to logout a user
     @Override
-=======
-   /* // Method to sign up a new user
-    public User signup(String email, String username, String password, LocalDate dateOfBirth) {
-        String userId = generateUserId();
-        User newUser  = new User(userId, email, username, password, dateOfBirth,Status.ONLINE);
-        newUser.hashedPass(password);
-        users.add(newUser );
-        System.out.println("User  signed up: " + username);
-        return newUser;
-    }*/
-
-    // Method to login a user
-    //CREATE A VALIDATION CLASS ( CONTAIN , CONTAIN USERNAME)
-    public boolean contain(String email){
-          for (User  user : users) {
-            if (user.getEmail().equals(email)) {
-
-                return true;
-            } 
-        }
-           return false ;
-    }
-    public boolean containUserName(String username){
-          for (User  user : users) {
-            if (user.getUsername().equals(username)) {
-
-                return true;
-            } 
-        }
-           return false ;
-    }
-    public User findUserByEmail(String email){
-       for (User user : users ) {
-            if (user.getEmail().equals(email)) {
-                return user;
-            }
-        }
-        return null;
-    }
-    public User findUserById(String userId) {
-    for (User user : users) {
-        if (user.getUserId().equals(userId)) {
-            return user;
-        }
-    }
-    return null; // User not found
-}
-
-    // Method to logout a user
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
     public void logout(User user) {
         if (user != null) {
             user.setStatus(Status.OFFLINE);
@@ -114,11 +53,7 @@ public class UserAccountManagement {
     }
 
     // Method to generate a unique user ID (for simplicity, using username here)
-<<<<<<< HEAD
     private String generateUserId() {
-=======
-    public String generateUserId() {
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
         return  Integer.toString(users.size()+ 100); // Simple user ID generation
     }
       // Method to display all users (for testing purposes)
@@ -130,10 +65,7 @@ public class UserAccountManagement {
 }
 
   // Static method to save a list of users to a JSON file
-<<<<<<< HEAD
     @Override
-=======
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
 public  void saveUsers(List<User> users, String filePath) {
     try {
         JSONArray jsonArray = new JSONArray();
@@ -147,36 +79,6 @@ public  void saveUsers(List<User> users, String filePath) {
             obj.put("dateOfBirth", user.getDateOfBirth().toString());
             obj.put("status", user.getStatus().toString());
             jsonArray.put(obj);
-<<<<<<< HEAD
-=======
-              JSONArray friendsArray = new JSONArray();
-                for (User friend : user.getFriends()) {
-                    JSONObject friendObj = new JSONObject();
-                    friendObj.put("userId", friend.getUserId());
-                    /*friendObj.put("email", friend.getEmail());
-                    friendObj.put("username", friend.getUsername());
-                    friendObj.put("password", user.getPassword());
-                    friendObj.put("dateOfBirth", user.getDateOfBirth().toString());
-                    friendObj.put("status", friend.getStatus().toString());*/
-                    friendsArray.put(friendObj);
-                }
-                obj.put("friends", friendsArray);
-
-                // Serialize blocked users
-                JSONArray blockedArray = new JSONArray();
-                for (User blocked : user.getBlocked()) {
-                    JSONObject blockedObj = new JSONObject();
-                    blockedObj.put("userId", blocked.getUserId());
-                    /*blockedObj.put("username", blocked.getUsername());
-                    blockedObj.put("email", blocked.getEmail());
-                    blockedObj.put("status", blocked.getStatus().toString());*/
-                    blockedArray.put(blockedObj);
-                }
-                obj.put("blocked", blockedArray);
-
-                // Add the user object to the users array
-                jsonArray.put(obj);
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
         }
 
         try (Writer writer = new FileWriter(filePath)) {
@@ -191,10 +93,7 @@ public  void saveUsers(List<User> users, String filePath) {
 }
 
 // Static method to load users from a JSON file
-<<<<<<< HEAD
 @Override
-=======
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
 public  List<User> loadUsers(String filePath) {
    // List<User> users = new ArrayList<>();
     try {
@@ -214,42 +113,8 @@ public  List<User> loadUsers(String filePath) {
                 String password = obj.getString("password");
                 LocalDate dateOfBirth = LocalDate.parse(obj.getString("dateOfBirth"));
                 Status status = Status.valueOf(obj.getString("status"));
-<<<<<<< HEAD
                 users.add(new User(userId, email, username, password, dateOfBirth, status));
             }
-=======
-                User user= new User(userId, email, username, password, dateOfBirth, status);
-                
-                 // Parse friend IDs
-            JSONArray friendsArray = obj.getJSONArray("friends");
-            List<User> friends = new ArrayList<>();
-            for (int j = 0; j < friendsArray.length(); j++) {
-                String friendId = friendsArray.getString(j);
-                User friend = findUserById(friendId);
-                if (friend != null) {
-                    friends.add(friend);
-                }
-            }
-            user.getFriends().addAll(friends);
-
-            // Parse blocked user IDs
-            JSONArray blockedArray = obj.getJSONArray("blocked");
-            List<User> blockedUsers = new ArrayList<>();
-            for (int j = 0; j < blockedArray.length(); j++) {
-                String blockedId = blockedArray.getString(j);
-                User blocked = findUserById(blockedId);
-                if (blocked != null) {
-                    blockedUsers.add(blocked);
-                }
-            }
-            user.getBlocked().addAll(blockedUsers);
-
-            // Add user to the users list
-            users.add(user);
-        }
-
-            
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
             System.out.println("Users loaded successfully from " + filePath);
         }
     } catch (IOException e) {
@@ -260,10 +125,5 @@ public  List<User> loadUsers(String filePath) {
     return users;
 }
 
-<<<<<<< HEAD
-=======
-
-  
->>>>>>> a9b5cf3e4412d42b613bc4574a8fecaa14433c4e
     }
     
