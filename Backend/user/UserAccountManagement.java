@@ -31,6 +31,7 @@ public class UserAccountManagement{
         for (User user : users) {
             System.out.println("User ID: " + user.getUserId() + ", Username: " + user.getUsername() + ", Email: " + user.getEmail() + ", Status: " + user.getStatus());
             System.out.println("Password: " + user.getPassword());
+           
         }
     }
 

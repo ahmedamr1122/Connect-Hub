@@ -104,6 +104,30 @@ public class User {
         return stories;
     }
 
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
+    public void setBlocked(List<User> Blocked) {
+        this.Blocked = Blocked;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public void setStories(List<Story> stories) {
+        this.stories = stories;
+    }
+
+    public void setSentRequests(List<FriendRequest> sentRequests) {
+        this.sentRequests = sentRequests;
+    }
+
+    public void setReceivedRequests(List<FriendRequest> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
+    
     public void setCoverPhoto(String coverPhoto) {
         this.coverPhoto = coverPhoto;
     }
@@ -139,6 +163,13 @@ public class User {
 
     public List<User> getSuggestFriends() {
         return suggestFriends;
+    }
+    public void displayFriends(){
+           for (Post user : posts) {
+            System.out.println("User ID: " + user.getAuthorId()+ ", Username: " + user.getContentId()+ ", Email: " + user.getContentText()+ ", Status: " + user.getImagePath());
+            System.out.println("Password: " + user.getType());
+           
+        }
     }
     
     
