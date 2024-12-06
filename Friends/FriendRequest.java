@@ -4,29 +4,29 @@ import Backend.user.User;
 
 public class FriendRequest {
     
-    private User sender;
-    private User receiver;
+    private String sender;
+    private String receiver;
     private RequestStatus status;
 
-    public FriendRequest(User sender, User receiver, RequestStatus status) {
+    public FriendRequest(String sender, String receiver, RequestStatus status) {
         this.sender = sender;
         this.receiver = receiver;
         this.status = status;
     }
 
-    public User getSender() {
+    public String getSender() {
         return sender;
     }
 
-    public void setSender(User sender) {
+    public void setSender(String sender) {
         this.sender = sender;
     }
 
-    public User getReceiver() {
+    public String getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User receiver) {
+    public void setReceiver(String receiver) {
         this.receiver = receiver;
     }
 
@@ -37,11 +37,11 @@ public class FriendRequest {
     public void setStatus(RequestStatus status) {
         this.status = status;
     }
-    public FriendRequest findRequest(User sender,User receiver){
+    public static FriendRequest findRequest(User sender,User receiver){
             FriendRequest request = null;
             for (int i=0;i< sender.getSentRequests().size();i++){
-                User user = sender.getSentRequests().get(i).getReceiver();
-                if(user.getUserId().equals(receiver.getUserId())){
+                String userId = sender.getSentRequests().get(i).getReceiver();
+                if(userId.equals(receiver.getUserId())){
                     request = sender.getSentRequests().get(i);
                     break;
                 }

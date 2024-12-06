@@ -14,7 +14,7 @@ public class FriendManagerImplement implements FriendManager{
             return;
         }
         
-        FriendRequest request = new FriendRequest(sender , receiver, RequestStatus.PENDING);
+        FriendRequest request = new FriendRequest(sender.getUserId() , receiver.getUserId(), RequestStatus.PENDING);
         
         sender.getSentRequests().add(request);
         receiver.getReceivedRequests().add(request);

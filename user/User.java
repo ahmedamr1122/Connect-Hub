@@ -40,6 +40,8 @@ public class User {
         this.Blocked = new ArrayList<>();
         this.posts = new ArrayList<>();
         this.stories = new ArrayList<>();
+        this.receivedRequests = new ArrayList<>();
+        this.sentRequests = new ArrayList<>();
         
     }
     
