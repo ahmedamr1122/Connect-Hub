@@ -1,5 +1,6 @@
-package Backend;
+package Backend.content;
 
+import Backend.content.Content;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

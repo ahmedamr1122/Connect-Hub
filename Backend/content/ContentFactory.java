@@ -1,4 +1,4 @@
-package Backend;
+package Backend.content;
 
 import org.json.JSONObject;
 import java.time.LocalDateTime;
