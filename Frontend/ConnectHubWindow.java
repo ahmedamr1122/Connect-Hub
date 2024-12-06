@@ -4,16 +4,36 @@
  */
 package Frontend;
 
-import Backend.ContentService;
+import Backend.content.ContentService;
+import Backend.content.Post;
+import Backend.content.Story;
+import Backend.profile.ProfileUpdater;
+import Backend.user.Status;
+import Backend.user.User;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -26,9 +46,28 @@ public class ConnectHubWindow extends javax.swing.JFrame {
      */
     private String selectedImagePath;
     private ContentService contentService;
+    private User currentUser;
     
     public ConnectHubWindow() {
         initComponents();
+        contentService = new ContentService(); // Assuming ContentService handles User's posts and stories internally
+        currentUser = new User(
+            "u1",
+            "user1@example.com",
+            "User1",
+            "hashed_password",
+            LocalDate.of(2000, 1, 1),
+            Status.ONLINE,
+            "This is User1's bio",
+            "/path/to/profilePhoto.jpg",
+            "/path/to/coverPhoto.jpg"
+        );
+
+        try {
+            refreshNewsfeed();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
        // contentService = ew ContentService("");
     }
 
@@ -56,18 +95,18 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         kGradientPanel4 = new keeptoo.KGradientPanel();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane(postPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        postPanel = new javax.swing.JPanel();
         addPostButton = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane(StoriesPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         StoriesPanel = new javax.swing.JPanel();
-        storyPanel1 = new javax.swing.JPanel();
-        viewStory1 = new javax.swing.JLabel();
-        storyPanel2 = new javax.swing.JPanel();
-        viewStory = new javax.swing.JLabel();
-        storyPanel = new javax.swing.JPanel();
-        viewStory2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
+        refresh = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jPanel7 = new javax.swing.JPanel();
+        pfp = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         kGradientPanel3 = new keeptoo.KGradientPanel();
         postStoryButton = new javax.swing.JButton();
@@ -87,6 +126,22 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         postCaptionTextField = new javax.swing.JTextField();
         postPostButton = new javax.swing.JButton();
+        kGradientPanel6 = new keeptoo.KGradientPanel();
+        coverPhotoLabel = new javax.swing.JLabel();
+        profilePicLabel = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        friendsScrollPanel = new javax.swing.JScrollPane();
+        friendsPanel = new javax.swing.JPanel();
+        userPosts = new javax.swing.JScrollPane(postPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        userPostPanel = new javax.swing.JPanel();
+        uploadPfp = new javax.swing.JButton();
+        blockUsers = new javax.swing.JButton();
+        uploadCoverPhoto1 = new javax.swing.JButton();
+        updatePass = new javax.swing.JButton();
+        updateBio = new javax.swing.JButton();
+        bioLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -211,12 +266,15 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("tab1", kGradientPanel1);
 
-        kGradientPanel4.setkEndColor(new java.awt.Color(51, 0, 51));
+        kGradientPanel4.setkEndColor(new java.awt.Color(255, 204, 255));
         kGradientPanel4.setkStartColor(new java.awt.Color(51, 0, 51));
         kGradientPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(51, 0, 51)));
+
+        postPanel.setLayout(new javax.swing.BoxLayout(postPanel, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane2.setViewportView(postPanel);
 
         addPostButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
         addPostButton.setText("jLabel9");
@@ -235,9 +293,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addComponent(jScrollPane2)
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(297, 297, 297)
+                .addGap(296, 296, 296)
                 .addComponent(addPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(309, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,100 +303,13 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(addPostButton))
+                .addComponent(addPostButton)
+                .addContainerGap())
         );
 
-        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 60, 660, 460));
+        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 60, 660, 470));
 
-        StoriesPanel.setBackground(new java.awt.Color(51, 0, 51));
-
-        storyPanel1.setBackground(new java.awt.Color(51, 0, 51));
-
-        viewStory1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
-        viewStory1.setText("jLabel9");
-        viewStory1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                viewStory1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout storyPanel1Layout = new javax.swing.GroupLayout(storyPanel1);
-        storyPanel1.setLayout(storyPanel1Layout);
-        storyPanel1Layout.setHorizontalGroup(
-            storyPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, storyPanel1Layout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
-                .addComponent(viewStory1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
-        );
-        storyPanel1Layout.setVerticalGroup(
-            storyPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(storyPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(viewStory1)
-                .addContainerGap(24, Short.MAX_VALUE))
-        );
-
-        StoriesPanel.add(storyPanel1);
-
-        storyPanel2.setBackground(new java.awt.Color(51, 0, 51));
-
-        viewStory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
-        viewStory.setText("jLabel9");
-        viewStory.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                viewStoryMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout storyPanel2Layout = new javax.swing.GroupLayout(storyPanel2);
-        storyPanel2.setLayout(storyPanel2Layout);
-        storyPanel2Layout.setHorizontalGroup(
-            storyPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(storyPanel2Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(viewStory, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
-        );
-        storyPanel2Layout.setVerticalGroup(
-            storyPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(storyPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(viewStory)
-                .addContainerGap(24, Short.MAX_VALUE))
-        );
-
-        StoriesPanel.add(storyPanel2);
-
-        storyPanel.setBackground(new java.awt.Color(51, 0, 51));
-
-        viewStory2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Plus.png"))); // NOI18N
-        viewStory2.setText("jLabel9");
-        viewStory2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                viewStory2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout storyPanelLayout = new javax.swing.GroupLayout(storyPanel);
-        storyPanel.setLayout(storyPanelLayout);
-        storyPanelLayout.setHorizontalGroup(
-            storyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(storyPanelLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(viewStory2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
-        );
-        storyPanelLayout.setVerticalGroup(
-            storyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(storyPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(viewStory2)
-                .addContainerGap(24, Short.MAX_VALUE))
-        );
-
-        StoriesPanel.add(storyPanel);
-
+        StoriesPanel.setBackground(new java.awt.Color(255, 204, 255));
         jScrollPane1.setViewportView(StoriesPanel);
 
         kGradientPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, -6, 510, 70));
@@ -372,6 +343,44 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         );
 
         kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 160, 60));
+
+        refresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/refresh2.png"))); // NOI18N
+        refresh.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                refreshMouseClicked(evt);
+            }
+        });
+        kGradientPanel4.add(refresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 50, 50));
+
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setText("Friend Suggestions");
+        kGradientPanel4.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, -1, -1));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 124, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 214, Short.MAX_VALUE)
+        );
+
+        jScrollPane4.setViewportView(jPanel7);
+
+        kGradientPanel4.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 130, 220));
+
+        pfp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Female User.png"))); // NOI18N
+        pfp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pfpMouseClicked(evt);
+            }
+        });
+        kGradientPanel4.add(pfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 10, -1, -1));
 
         jTabbedPane2.addTab("tab3", kGradientPanel4);
 
@@ -616,7 +625,111 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("tab4", kGradientPanel5);
 
-        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 890, 560));
+        kGradientPanel6.setkEndColor(new java.awt.Color(51, 0, 51));
+        kGradientPanel6.setkStartColor(new java.awt.Color(255, 204, 255));
+        kGradientPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        kGradientPanel6.add(coverPhotoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 393, 190));
+
+        profilePicLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        profilePicLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/1-removebg.png"))); // NOI18N
+        kGradientPanel6.add(profilePicLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, -1, 98));
+
+        jButton1.setBackground(new java.awt.Color(255, 204, 255));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(51, 0, 51));
+        jButton1.setText("Upload Photo");
+        kGradientPanel6.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(876, 247, 125, 23));
+
+        jLabel17.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel17.setText("Bio:");
+        kGradientPanel6.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 260, -1, -1));
+
+        jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel20.setText("Your Friends");
+        kGradientPanel6.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, -1, -1));
+
+        friendsPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout friendsPanelLayout = new javax.swing.GroupLayout(friendsPanel);
+        friendsPanel.setLayout(friendsPanelLayout);
+        friendsPanelLayout.setHorizontalGroup(
+            friendsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 192, Short.MAX_VALUE)
+        );
+        friendsPanelLayout.setVerticalGroup(
+            friendsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 210, Short.MAX_VALUE)
+        );
+
+        friendsScrollPanel.setViewportView(friendsPanel);
+
+        kGradientPanel6.add(friendsScrollPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(97, 321, -1, 204));
+
+        userPostPanel.setBackground(new java.awt.Color(255, 255, 255));
+        userPostPanel.setLayout(new javax.swing.BoxLayout(userPostPanel, javax.swing.BoxLayout.Y_AXIS));
+        userPosts.setViewportView(userPostPanel);
+
+        kGradientPanel6.add(userPosts, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, -10, 465, 540));
+
+        uploadPfp.setBackground(new java.awt.Color(255, 204, 255));
+        uploadPfp.setForeground(new java.awt.Color(51, 0, 51));
+        uploadPfp.setText("Upload Profile Photo");
+        uploadPfp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadPfpActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(uploadPfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 210, 150, -1));
+
+        blockUsers.setBackground(new java.awt.Color(255, 204, 255));
+        blockUsers.setForeground(new java.awt.Color(51, 0, 51));
+        blockUsers.setText("Block Users");
+        blockUsers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blockUsersActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(blockUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 430, 130, -1));
+
+        uploadCoverPhoto1.setBackground(new java.awt.Color(255, 204, 255));
+        uploadCoverPhoto1.setForeground(new java.awt.Color(51, 0, 51));
+        uploadCoverPhoto1.setText("Upload Cover Photo");
+        uploadCoverPhoto1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadCoverPhoto1ActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(uploadCoverPhoto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 240, 150, -1));
+
+        updatePass.setBackground(new java.awt.Color(255, 204, 255));
+        updatePass.setForeground(new java.awt.Color(51, 0, 51));
+        updatePass.setText("Update Password");
+        updatePass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updatePassActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(updatePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 460, 130, -1));
+
+        updateBio.setBackground(new java.awt.Color(255, 204, 255));
+        updateBio.setForeground(new java.awt.Color(51, 0, 51));
+        updateBio.setText("Update Bio");
+        updateBio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateBioActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(updateBio, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 100, -1));
+
+        bioLabel.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        kGradientPanel6.add(bioLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 290, 170, 30));
+
+        jTabbedPane2.addTab("tab5", kGradientPanel6);
+
+        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 890, 560));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -624,21 +737,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
         jTabbedPane2.setSelectedIndex(2);
     }//GEN-LAST:event_jLabel9MouseClicked
-
-    private void viewStory2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStory2MouseClicked
-        displayStoryDetails detailsWindow = new displayStoryDetails();
-        detailsWindow.setVisible(true);
-    }//GEN-LAST:event_viewStory2MouseClicked
-
-    private void viewStoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStoryMouseClicked
-        displayStoryDetails detailsWindow = new displayStoryDetails();
-        detailsWindow.setVisible(true);
-    }//GEN-LAST:event_viewStoryMouseClicked
-
-    private void viewStory1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewStory1MouseClicked
-        displayStoryDetails detailsWindow = new displayStoryDetails();
-        detailsWindow.setVisible(true);
-    }//GEN-LAST:event_viewStory1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         jTabbedPane2.setSelectedIndex(1);
@@ -659,6 +757,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private void postStoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postStoryButtonActionPerformed
         try {
             postStory();
+            jTabbedPane2.setSelectedIndex(1);
         } catch (IOException ex) {
             Logger.getLogger(ConnectHubWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -679,10 +778,44 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private void postPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postPostButtonActionPerformed
         try {
             postPost();
+            jTabbedPane2.setSelectedIndex(1);
         } catch (IOException ex) {
             Logger.getLogger(ConnectHubWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_postPostButtonActionPerformed
+
+    private void refreshMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshMouseClicked
+        try {
+                    refreshNewsfeed();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+    }//GEN-LAST:event_refreshMouseClicked
+
+    private void pfpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pfpMouseClicked
+        jTabbedPane2.setSelectedIndex(4);
+        displayFriendsList(currentUser);
+    }//GEN-LAST:event_pfpMouseClicked
+
+    private void uploadPfpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadPfpActionPerformed
+        uploadProfilePicture();
+    }//GEN-LAST:event_uploadPfpActionPerformed
+
+    private void blockUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsersActionPerformed
+        uploadCoverPhoto();
+    }//GEN-LAST:event_blockUsersActionPerformed
+
+    private void uploadCoverPhoto1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadCoverPhoto1ActionPerformed
+        uploadCoverPhoto();
+    }//GEN-LAST:event_uploadCoverPhoto1ActionPerformed
+
+    private void updatePassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePassActionPerformed
+        updatePassword();
+    }//GEN-LAST:event_updatePassActionPerformed
+
+    private void updateBioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateBioActionPerformed
+        updateBio();
+    }//GEN-LAST:event_updateBioActionPerformed
 
         private void uploadImageStory() 
         {
@@ -733,31 +866,381 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
 
         // Call createStory method from ContentService
-        contentService.createStory("userId", caption, selectedImagePath);
+        contentService.createStory(currentUser, caption, selectedImagePath);
         JOptionPane.showMessageDialog(this, "Story posted successfully!");
         // Clear inputs
         storyCaptionTextField.setText("");
         imagePreview.setIcon(null);
         imagePreview.setText("No image selected");
         selectedImagePath = null;
+        refreshNewsfeed();
        }
         private void postPost() throws IOException {
-        String caption = postCaptionTextField.getText().trim();
+            String caption = postCaptionTextField.getText().trim();
 
-        if (selectedImagePath == null || selectedImagePath.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please upload an image for the Post.");
-            return;
+            if (selectedImagePath == null || selectedImagePath.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please upload an image for the Post.");
+                return;
+            }
+
+            // Call createStory method from ContentService
+            contentService.createPost(currentUser , caption, selectedImagePath);
+            JOptionPane.showMessageDialog(this, "Post added successfully!");
+            // Clear inputs
+            postCaptionTextField.setText("");
+            ImagePreview2.setIcon(null);
+            ImagePreview2.setText("No image selected");
+            selectedImagePath = null;
+            refreshNewsfeed();
+            displayUserPosts(currentUser);
+            
+       }
+        
+        private void refreshNewsfeed() throws IOException {
+            // Clear existing components
+            StoriesPanel.removeAll();
+            postPanel.removeAll();
+
+            // Fetch and update active stories
+            List<Story> activeStories = contentService.getFriendStories(currentUser);
+            activeStories.addAll(currentUser.getStories());
+            for (Story story : activeStories) {
+                addStoryToPanel(story);
+            }
+
+            // Fetch and update posts
+            List<Post> posts = contentService.getFriendPosts(currentUser);
+            posts.addAll(currentUser.getPosts());
+            for (Post post : posts) {
+                addPostToPanel(post);
+            }
+
+            // Refresh panels
+            StoriesPanel.revalidate();
+            StoriesPanel.repaint();
+            postPanel.revalidate();
+            postPanel.repaint();
+        }
+        
+        private void addStoryToPanel(Story story) {
+            JLabel storyLabel = new JLabel(new ImageIcon(new ImageIcon(story.getImagePath()).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+            storyLabel.setToolTipText(story.getContentText());
+            storyLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            // Open story details on click
+            storyLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    new displayStoryDetails(story).setVisible(true);
+                }
+            });
+
+            StoriesPanel.add(storyLabel);
+        }
+        /*
+        private void addPostToPanel(Post post) {
+        JPanel postItemPanel = new JPanel();
+        postItemPanel.setLayout(new BorderLayout());
+        postItemPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        postItemPanel.setPreferredSize(new Dimension(638, 392));
+
+        JLabel contentLabel = new JLabel("<html>" + post.getContentText() + "</html>");
+        contentLabel.setFont(new Font("Arial", Font.PLAIN, 14)); 
+        contentLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        contentLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BorderLayout());
+        
+        JLabel userNameLabel = new JLabel(post.getAuthorId());  // Get the user's name from the post
+        userNameLabel.setFont(new Font("Arial", Font.BOLD, 14));  // Set the font for the user name
+        headerPanel.add(userNameLabel, BorderLayout.WEST);
+
+        JLabel imageLabel = new JLabel();
+        if (post.getImagePath() != null && !post.getImagePath().isEmpty()) {
+            ImageIcon originalImage = new ImageIcon(post.getImagePath());
+        
+            // Maintain aspect ratio while scaling
+            int maxWidth = 638;  // Max width for the image
+            int maxHeight = 292; // Max height for the image
+
+            int imageWidth = originalImage.getIconWidth();
+            int imageHeight = originalImage.getIconHeight();
+
+            // Calculate the scaling factor to maintain aspect ratio
+            double widthRatio = (double) maxWidth / imageWidth;
+            double heightRatio = (double) maxHeight / imageHeight;
+
+            double scaleRatio = Math.min(widthRatio, heightRatio);  // Use the smaller ratio to maintain aspect ratio
+
+            int newWidth = (int) (imageWidth * scaleRatio);
+            int newHeight = (int) (imageHeight * scaleRatio);
+
+            Image scaledImage = originalImage.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(scaledImage));
+        }
+        postItemPanel.add(headerPanel, BorderLayout.NORTH);
+
+            // Add the image label to the center of the panel
+        postItemPanel.add(imageLabel, BorderLayout.CENTER);
+
+            // Add the content label (caption) at the bottom of the post
+        postItemPanel.add(contentLabel, BorderLayout.SOUTH);
+
+        postPanel.add(postItemPanel);
+    }*/
+    private JPanel createPostItemPanel(Post post) {
+        JPanel postItemPanel = new JPanel();
+        postItemPanel.setLayout(new BorderLayout());
+        postItemPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        postItemPanel.setPreferredSize(new Dimension(638, 392));
+
+        // Create the content label (caption)
+        JLabel contentLabel = new JLabel("<html>" + post.getContentText() + "</html>");
+        contentLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        contentLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+
+        // Create the header panel (user name)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BorderLayout());
+
+        // Add user name to the left
+        JLabel userNameLabel = new JLabel(post.getAuthorId());  // Get the user's name from the post
+        userNameLabel.setFont(new Font("Arial", Font.BOLD, 14));  // Set the font for the user name
+        headerPanel.add(userNameLabel, BorderLayout.WEST);
+
+        // Create the image label
+        JLabel imageLabel = new JLabel();
+        if (post.getImagePath() != null && !post.getImagePath().isEmpty()) {
+            ImageIcon originalImage = new ImageIcon(post.getImagePath());
+
+            // Maintain aspect ratio while scaling
+            int maxWidth = 638;  // Max width for the image
+            int maxHeight = 292; // Max height for the image
+
+            int imageWidth = originalImage.getIconWidth();
+            int imageHeight = originalImage.getIconHeight();
+
+            // Calculate the scaling factor to maintain aspect ratio
+            double widthRatio = (double) maxWidth / imageWidth;
+            double heightRatio = (double) maxHeight / imageHeight;
+
+            double scaleRatio = Math.min(widthRatio, heightRatio);  // Use the smaller ratio to maintain aspect ratio
+
+            int newWidth = (int) (imageWidth * scaleRatio);
+            int newHeight = (int) (imageHeight * scaleRatio);
+
+            Image scaledImage = originalImage.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(scaledImage));
+    }
+
+    // Add the header panel (user name) to the post
+    postItemPanel.add(headerPanel, BorderLayout.NORTH);
+
+    // Add the image label to the center of the panel
+    postItemPanel.add(imageLabel, BorderLayout.CENTER);
+
+    // Add the content label (caption) at the bottom of the post
+    postItemPanel.add(contentLabel, BorderLayout.SOUTH);
+
+    return postItemPanel;
+}
+   
+        private void displayUserPosts(User currentUser) {
+            
+            userPostPanel.removeAll();
+            for (Post post : currentUser.getPosts()) {
+                addPostToUserPanel(post);
+            }
+            userPostPanel.revalidate();
+            userPostPanel.repaint();
+        }
+        /*
+        private void addPostToUserPanel(Post post){
+            JPanel postItemUserPanel = new JPanel();
+            postItemUserPanel.setLayout(new BorderLayout());
+            postItemUserPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            postItemUserPanel.setPreferredSize(new Dimension(638, 392));
+
+            JLabel contentUserLabel = new JLabel("<html>" + post.getContentText() + "</html>");
+            contentUserLabel.setFont(new Font("Arial", Font.PLAIN, 14)); 
+            contentUserLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            contentUserLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+
+            JPanel headerPanel = new JPanel();
+            headerPanel.setLayout(new BorderLayout());
+
+            JLabel userNameLabel = new JLabel(post.getAuthorId());  // Get the user's name from the post
+            userNameLabel.setFont(new Font("Arial", Font.BOLD, 14));  // Set the font for the user name
+            headerPanel.add(userNameLabel, BorderLayout.WEST);
+
+            JLabel imageLabel = new JLabel();
+            if (post.getImagePath() != null && !post.getImagePath().isEmpty())
+            {
+                ImageIcon originalImage = new ImageIcon(post.getImagePath());
+
+                // Maintain aspect ratio while scaling
+                int maxWidth = 638;  // Max width for the image
+                int maxHeight = 292; // Max height for the image
+
+                int imageWidth = originalImage.getIconWidth();
+                int imageHeight = originalImage.getIconHeight();
+
+                // Calculate the scaling factor to maintain aspect ratio
+                double widthRatio = (double) maxWidth / imageWidth;
+                double heightRatio = (double) maxHeight / imageHeight;
+
+                double scaleRatio = Math.min(widthRatio, heightRatio);  // Use the smaller ratio to maintain aspect ratio
+
+                int newWidth = (int) (imageWidth * scaleRatio);
+                int newHeight = (int) (imageHeight * scaleRatio);
+
+                Image scaledImage = originalImage.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                imageLabel.setIcon(new ImageIcon(scaledImage));
+            }
+            postItemUserPanel.add(headerPanel, BorderLayout.NORTH);
+
+                // Add the image label to the center of the panel
+            postItemUserPanel.add(imageLabel, BorderLayout.CENTER);
+
+                // Add the content label (caption) at the bottom of the post
+            postItemUserPanel.add(contentUserLabel, BorderLayout.SOUTH);
+
+            userPostPanel.add(postItemUserPanel);
+        }*/
+        
+        private void addPostToPanel(Post post) {
+            JPanel postItemPanel = createPostItemPanel(post);  // Reuse the helper method
+            postPanel.add(postItemPanel);
         }
 
-        // Call createStory method from ContentService
-        contentService.createStory("userId", caption, selectedImagePath);
-        JOptionPane.showMessageDialog(this, "Post added successfully!");
-        // Clear inputs
-        storyCaptionTextField.setText("");
-        imagePreview.setIcon(null);
-        imagePreview.setText("No image selected");
-        selectedImagePath = null;
-       }
+        private void addPostToUserPanel(Post post) {
+            JPanel postItemUserPanel = createPostItemPanel(post);  // Reuse the helper method
+            userPostPanel.add(postItemUserPanel);
+        }
+        
+        private void displayFriendsList(User currentUser){
+            for (User friend : currentUser.getFriends()) {
+                JLabel friendLabel = new JLabel(friend.getUsername() + " (" + friend.getStatus() + ")");
+                friendsPanel.add(friendLabel);
+            }
+        }
+        
+        private void uploadProfilePicture() {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+            int result = fileChooser.showOpenDialog(this);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String filePath = selectedFile.getAbsolutePath();
+
+                try {
+                    // Using ProfileUpdater to update the profile picture
+                    ProfileUpdater profileUpdater = new ProfileUpdater();
+                    profileUpdater.updateProfilePhoto(currentUser.getUserId(), filePath); // Update the profile photo
+
+                    // Set the profile picture in a circular shape
+                    ImageIcon profilePicIcon = new ImageIcon(filePath);
+                    Image profilePicImage = profilePicIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                    ImageIcon profilePicCircularIcon = new ImageIcon(createCircularImage(profilePicImage));
+
+                    profilePicLabel.setIcon(profilePicCircularIcon); // Assuming profilePicLabel is the JLabel showing the profile image
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error updating profile picture.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        
+        private Image createCircularImage(Image image) {
+            int width = image.getWidth(null);
+            int height = image.getHeight(null);
+
+            if (width <= 0 || height <= 0) {
+                throw new IllegalArgumentException("Invalid image dimensions: width = " + width + ", height = " + height);
+            }
+
+            int diameter = Math.min(width, height);
+            BufferedImage circularImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = circularImage.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setClip(new Ellipse2D.Float(0, 0, diameter, diameter));
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            return circularImage;
+        }
+
+        
+        private void uploadCoverPhoto() {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+            int result = fileChooser.showOpenDialog(this);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String filePath = selectedFile.getAbsolutePath();
+
+                try {
+                    // Using ProfileUpdater to update the cover photo
+                    ProfileUpdater profileUpdater = new ProfileUpdater();
+                    profileUpdater.updateCoverPhoto(currentUser.getUserId(), filePath); // Update the cover photo
+
+                    // Update the cover photo on the profile page
+                    ImageIcon coverPhotoIcon = new ImageIcon(filePath);
+                    coverPhotoLabel.setIcon(coverPhotoIcon); // Assuming coverPhotoLabel is the JLabel for the cover photo
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error updating cover photo.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        
+        private void updatePassword() {
+            String newPassword = JOptionPane.showInputDialog(this, "Enter new password:");
+            if (newPassword != null && !newPassword.isEmpty()) {
+                try {
+                    ProfileUpdater profileUpdater = new ProfileUpdater();
+                    profileUpdater.updatePassword(currentUser.getUserId(), newPassword); // Update the password in the user profile
+                    JOptionPane.showMessageDialog(this, "Password updated successfully!");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error updating password.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        private void updateBio() {
+            // Prompt the user to enter a new bio
+            String newBio = JOptionPane.showInputDialog(this, "Enter your new bio:", "Update Bio", JOptionPane.PLAIN_MESSAGE);
+
+            // Check if the user canceled or entered an empty bio
+            if (newBio == null || newBio.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Bio cannot be empty or cancelled.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                // Use ProfileUpdater to update the bio
+                ProfileUpdater profileUpdater = new ProfileUpdater();
+                profileUpdater.updateBio(currentUser.getUserId(), newBio.trim()); // Update the bio for the current user
+
+                // Optionally, update the displayed bio on the profile page
+                JOptionPane.showMessageDialog(this, "Bio updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Update the displayed bio in the UI (e.g., a label)
+                bioLabel.setText(newBio.trim());  // Assuming bioLabel is a JLabel showing the bio
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating bio.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
         
         
     /**
@@ -799,15 +1282,24 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JLabel ImagePreview2;
     private javax.swing.JPanel StoriesPanel;
     private javax.swing.JLabel addPostButton;
+    private javax.swing.JLabel bioLabel;
+    private javax.swing.JButton blockUsers;
+    private javax.swing.JLabel coverPhotoLabel;
+    private javax.swing.JPanel friendsPanel;
+    private javax.swing.JScrollPane friendsScrollPanel;
     private javax.swing.JLabel imagePreview;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -820,27 +1312,34 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane2;
     private keeptoo.KGradientPanel kGradientPanel1;
     private keeptoo.KGradientPanel kGradientPanel2;
     private keeptoo.KGradientPanel kGradientPanel3;
     private keeptoo.KGradientPanel kGradientPanel4;
     private keeptoo.KGradientPanel kGradientPanel5;
+    private keeptoo.KGradientPanel kGradientPanel6;
+    private javax.swing.JLabel pfp;
     private javax.swing.JTextField postCaptionTextField;
+    private javax.swing.JPanel postPanel;
     private javax.swing.JButton postPostButton;
     private javax.swing.JButton postStoryButton;
+    private javax.swing.JLabel profilePicLabel;
+    private javax.swing.JLabel refresh;
     private javax.swing.JTextField storyCaptionTextField;
-    private javax.swing.JPanel storyPanel;
-    private javax.swing.JPanel storyPanel1;
-    private javax.swing.JPanel storyPanel2;
+    private javax.swing.JButton updateBio;
+    private javax.swing.JButton updatePass;
+    private javax.swing.JButton uploadCoverPhoto1;
+    private javax.swing.JButton uploadPfp;
     private javax.swing.JButton uploadPostButton;
     private javax.swing.JButton uploadStoryButton;
+    private javax.swing.JPanel userPostPanel;
+    private javax.swing.JScrollPane userPosts;
     private javax.swing.JTextField usernameField;
-    private javax.swing.JLabel viewStory;
-    private javax.swing.JLabel viewStory1;
-    private javax.swing.JLabel viewStory2;
     // End of variables declaration//GEN-END:variables
 }
