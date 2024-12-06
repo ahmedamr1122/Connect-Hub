@@ -1,6 +1,8 @@
 package Backend.friends;
 
 import Backend.user.User;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FriendManagerImplement implements FriendManager{
     
@@ -43,8 +45,17 @@ public class FriendManagerImplement implements FriendManager{
         sender.getFriends().remove(friend);
         friend.getFriends().remove(sender);
     }
-    
-    
+
+    @Override
+    public List<User> suggestFriends(User user, List<User> users) {
+        
+        List<User> suggestions = new ArrayList<>();
+        for(User findUser : users)
+        {
+            if(!user.equals(findUser) && !user.getBlocked().contains(findUser) && !user.getFriends().contains(findUser))
+                suggestions.add(findUser);
             
-    
+        }
+        return suggestions;
+    }
 }

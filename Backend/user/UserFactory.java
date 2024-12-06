@@ -1,6 +1,6 @@
 package Backend.user;
 
-import Backend.ContentFactory;
+import Backend.content.ContentFactory;
 import Backend.content.Content;
 import Backend.friends.FriendRequest;
 import Backend.friends.RequestStatus;

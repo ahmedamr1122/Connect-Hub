@@ -25,6 +25,8 @@ public class User {
     private List<Story> stories;
     private List <FriendRequest> sentRequests;
     private List <FriendRequest> receivedRequests;
+    private List <User> suggestFriends;
+    
     
     public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status,String bio,String profilePhoto,String coverPhoto) {
         this.userId = userId;
@@ -42,6 +44,7 @@ public class User {
         this.stories = new ArrayList<>();
         this.receivedRequests = new ArrayList<>();
         this.sentRequests = new ArrayList<>();
+        this.suggestFriends= new ArrayList<>();
         
     }
     
@@ -125,5 +128,10 @@ public class User {
     public List<FriendRequest> getReceivedRequests() {
         return receivedRequests;
     }
+
+    public List<User> getSuggestFriends() {
+        return suggestFriends;
+    }
+    
     
 }

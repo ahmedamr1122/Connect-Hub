@@ -118,7 +118,6 @@ public class FileManagement {
                 obj.put("Story", storyArray);
 
                 // Add the sent requests
-                
                 JSONArray sentRequestArray = new JSONArray();
                 for (FriendRequest request : user.getSentRequests()) {
                     JSONObject sentObj = new JSONObject();
@@ -129,7 +128,6 @@ public class FileManagement {
                 obj.put("sentRequest", sentRequestArray);
                 
                 // Add the received requests
-                
                 JSONArray receiveRequestArray = new JSONArray();
                 for (FriendRequest request : user.getReceivedRequests()) {
                     JSONObject receivedObj = new JSONObject();
