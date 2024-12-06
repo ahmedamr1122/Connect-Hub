@@ -19,4 +19,13 @@ public class FindUser extends UserAccountManagement{
     }
     return null; // User not found
 }
+    public User findUserByUsername(String username) {
+    for (User user : super.getUsers()) {
+        if (user.getUsername().equals(username)) {
+            return user;
+        }
+    }
+
+    return null; // User not found
+}
 }

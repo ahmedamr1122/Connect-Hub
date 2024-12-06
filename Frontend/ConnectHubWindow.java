@@ -4,30 +4,46 @@
  */
 package Frontend;
 
+import Backend.Friends.BlockManagerImplement;
 import Backend.content.ContentService;
 import Backend.content.Post;
 import Backend.content.Story;
+import Backend.friends.FriendManager;
+import Backend.friends.FriendManagerFactory;
+import Backend.friends.FriendRequest;
+import Backend.friends.RequestStatus;
 import Backend.profile.ProfileUpdater;
+import Backend.user.FindUser;
+import Backend.user.Login;
+import Backend.user.Logout;
+import Backend.user.SignUp;
 import Backend.user.Status;
 import Backend.user.User;
+import static Backend.user.UserAccountManagement.getUsers;
+import Backend.user.Validations;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -47,27 +63,18 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private String selectedImagePath;
     private ContentService contentService;
     private User currentUser;
+    private BlockManagerImplement blockManager;
+    private FriendManagerFactory friendmanagerfactory;
     
     public ConnectHubWindow() {
         initComponents();
         contentService = new ContentService(); // Assuming ContentService handles User's posts and stories internally
-        currentUser = new User(
-            "u1",
-            "user1@example.com",
-            "User1",
-            "hashed_password",
-            LocalDate.of(2000, 1, 1),
-            Status.ONLINE,
-            "This is User1's bio",
-            "/path/to/profilePhoto.jpg",
-            "/path/to/coverPhoto.jpg"
-        );
-
+/*
         try {
             refreshNewsfeed();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
        // contentService = ew ContentService("");
     }
 
@@ -85,11 +92,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         kGradientPanel2 = new keeptoo.KGradientPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        usernameField = new javax.swing.JTextField();
+        emailTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jButton2 = new javax.swing.JButton();
+        passwordField = new javax.swing.JPasswordField();
+        loginButton = new javax.swing.JButton();
+        signinLabel = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -103,10 +111,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         refresh = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jPanel7 = new javax.swing.JPanel();
         pfp = new javax.swing.JLabel();
+        friendManagementButton = new javax.swing.JButton();
+        logoutButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         kGradientPanel3 = new keeptoo.KGradientPanel();
         postStoryButton = new javax.swing.JButton();
@@ -129,19 +136,40 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         kGradientPanel6 = new keeptoo.KGradientPanel();
         coverPhotoLabel = new javax.swing.JLabel();
         profilePicLabel = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jLabel17 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        friendsScrollPanel = new javax.swing.JScrollPane();
+        friendsScrollPanel = new javax.swing.JScrollPane(friendsPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         friendsPanel = new javax.swing.JPanel();
-        userPosts = new javax.swing.JScrollPane(postPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        userPosts = new javax.swing.JScrollPane(userPostPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         userPostPanel = new javax.swing.JPanel();
         uploadPfp = new javax.swing.JButton();
-        blockUsers = new javax.swing.JButton();
+        removeFriendButton = new javax.swing.JButton();
         uploadCoverPhoto1 = new javax.swing.JButton();
         updatePass = new javax.swing.JButton();
         updateBio = new javax.swing.JButton();
         bioLabel = new javax.swing.JLabel();
+        backButton = new javax.swing.JButton();
+        blockUsers1 = new javax.swing.JButton();
+        kGradientPanel7 = new keeptoo.KGradientPanel();
+        jPanel6 = new javax.swing.JPanel();
+        emailTextField1 = new javax.swing.JTextField();
+        passwordField1 = new javax.swing.JPasswordField();
+        usernameTextField = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        signUpButton = new javax.swing.JButton();
+        dobTextField = new javax.swing.JTextField();
+        jLabel22 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        friendSuggestionScroll = new javax.swing.JScrollPane(suggestedFriendsPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        suggestedFriendsPanel = new javax.swing.JPanel();
+        receivedRequestsPanel = new javax.swing.JPanel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        sentRequestsPanel = new javax.swing.JPanel();
+        jLabel25 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -160,37 +188,50 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jLabel3.setForeground(new java.awt.Color(51, 0, 51));
         jLabel3.setText("LogIn");
 
-        usernameField.setBackground(new java.awt.Color(255, 255, 255));
-        usernameField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        usernameField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
-        usernameField.addActionListener(new java.awt.event.ActionListener() {
+        emailTextField.setBackground(new java.awt.Color(255, 255, 255));
+        emailTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        emailTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        emailTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                usernameFieldActionPerformed(evt);
+                emailTextFieldActionPerformed(evt);
             }
         });
 
         jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(51, 0, 51));
-        jLabel4.setText("User Name");
+        jLabel4.setText("Email");
 
         jLabel5.setBackground(new java.awt.Color(255, 255, 255));
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(51, 0, 51));
         jLabel5.setText("Password");
 
-        jPasswordField1.setBackground(new java.awt.Color(255, 255, 255));
-        jPasswordField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jPasswordField1.setForeground(new java.awt.Color(0, 0, 0));
-        jPasswordField1.setText("jPasswordField1");
-        jPasswordField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
-
-        jButton2.setBackground(new java.awt.Color(51, 0, 51));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jButton2.setText("Log in");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        passwordField.setBackground(new java.awt.Color(255, 255, 255));
+        passwordField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        passwordField.setForeground(new java.awt.Color(0, 0, 0));
+        passwordField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                passwordFieldActionPerformed(evt);
+            }
+        });
+
+        loginButton.setBackground(new java.awt.Color(51, 0, 51));
+        loginButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        loginButton.setText("Log in");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginButtonActionPerformed(evt);
+            }
+        });
+
+        signinLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        signinLabel.setForeground(new java.awt.Color(51, 0, 51));
+        signinLabel.setText("Don't have an account?");
+        signinLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                signinLabelMouseClicked(evt);
             }
         });
 
@@ -202,16 +243,18 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addContainerGap(116, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel5)
-                            .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                            .addComponent(jLabel4)
-                            .addComponent(jPasswordField1)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(90, 90, 90))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(176, 176, 176))))
+                        .addGap(176, 176, 176))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(signinLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel5)
+                                .addComponent(emailTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(jLabel4)
+                                .addComponent(passwordField)
+                                .addComponent(loginButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(90, 90, 90))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,14 +264,16 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addGap(33, 33, 33)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28)
-                .addComponent(jButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(loginButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(signinLabel)
+                .addContainerGap(139, Short.MAX_VALUE))
         );
 
         kGradientPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(462, 0, -1, 530));
@@ -307,7 +352,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 60, 660, 470));
+        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 650, 470));
 
         StoriesPanel.setBackground(new java.awt.Color(255, 204, 255));
         jScrollPane1.setViewportView(StoriesPanel);
@@ -342,7 +387,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addGap(16, 16, 16))
         );
 
-        kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 160, 60));
+        kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 0, 150, 60));
 
         refresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/refresh2.png"))); // NOI18N
         refresh.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -352,28 +397,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         });
         kGradientPanel4.add(refresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 50, 50));
 
-        jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel14.setText("Friend Suggestions");
-        kGradientPanel4.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, -1, -1));
-
-        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 124, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 214, Short.MAX_VALUE)
-        );
-
-        jScrollPane4.setViewportView(jPanel7);
-
-        kGradientPanel4.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 130, 220));
-
         pfp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/Female User.png"))); // NOI18N
         pfp.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -381,6 +404,27 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             }
         });
         kGradientPanel4.add(pfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 10, -1, -1));
+
+        friendManagementButton.setBackground(new java.awt.Color(255, 204, 255));
+        friendManagementButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        friendManagementButton.setForeground(new java.awt.Color(51, 0, 51));
+        friendManagementButton.setText("Friend Management");
+        friendManagementButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                friendManagementButtonActionPerformed(evt);
+            }
+        });
+        kGradientPanel4.add(friendManagementButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 460, -1, 60));
+
+        logoutButton.setBackground(new java.awt.Color(255, 255, 255));
+        logoutButton.setForeground(new java.awt.Color(51, 0, 51));
+        logoutButton.setText("Logout");
+        logoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutButtonActionPerformed(evt);
+            }
+        });
+        kGradientPanel4.add(logoutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 480, -1, -1));
 
         jTabbedPane2.addTab("tab3", kGradientPanel4);
 
@@ -428,6 +472,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         storyCaptionTextField.setBackground(new java.awt.Color(51, 0, 51));
         storyCaptionTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        storyCaptionTextField.setForeground(new java.awt.Color(255, 255, 255));
         storyCaptionTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(255, 204, 255)));
         storyCaptionTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -634,12 +679,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         profilePicLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/1-removebg.png"))); // NOI18N
         kGradientPanel6.add(profilePicLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, -1, 98));
 
-        jButton1.setBackground(new java.awt.Color(255, 204, 255));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(51, 0, 51));
-        jButton1.setText("Upload Photo");
-        kGradientPanel6.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(876, 247, 125, 23));
-
         jLabel17.setBackground(new java.awt.Color(255, 255, 255));
         jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(51, 0, 51));
@@ -652,21 +691,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         kGradientPanel6.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, -1, -1));
 
         friendsPanel.setBackground(new java.awt.Color(255, 255, 255));
-
-        javax.swing.GroupLayout friendsPanelLayout = new javax.swing.GroupLayout(friendsPanel);
-        friendsPanel.setLayout(friendsPanelLayout);
-        friendsPanelLayout.setHorizontalGroup(
-            friendsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 192, Short.MAX_VALUE)
-        );
-        friendsPanelLayout.setVerticalGroup(
-            friendsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
-        );
-
+        friendsPanel.setLayout(new javax.swing.BoxLayout(friendsPanel, javax.swing.BoxLayout.Y_AXIS));
         friendsScrollPanel.setViewportView(friendsPanel);
 
-        kGradientPanel6.add(friendsScrollPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(97, 321, -1, 204));
+        kGradientPanel6.add(friendsScrollPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(97, 321, 190, 204));
 
         userPostPanel.setBackground(new java.awt.Color(255, 255, 255));
         userPostPanel.setLayout(new javax.swing.BoxLayout(userPostPanel, javax.swing.BoxLayout.Y_AXIS));
@@ -684,15 +712,15 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         });
         kGradientPanel6.add(uploadPfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 210, 150, -1));
 
-        blockUsers.setBackground(new java.awt.Color(255, 204, 255));
-        blockUsers.setForeground(new java.awt.Color(51, 0, 51));
-        blockUsers.setText("Block Users");
-        blockUsers.addActionListener(new java.awt.event.ActionListener() {
+        removeFriendButton.setBackground(new java.awt.Color(255, 204, 255));
+        removeFriendButton.setForeground(new java.awt.Color(51, 0, 51));
+        removeFriendButton.setText("Remove Friend");
+        removeFriendButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blockUsersActionPerformed(evt);
+                removeFriendButtonActionPerformed(evt);
             }
         });
-        kGradientPanel6.add(blockUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 430, 130, -1));
+        kGradientPanel6.add(removeFriendButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, 130, -1));
 
         uploadCoverPhoto1.setBackground(new java.awt.Color(255, 204, 255));
         uploadCoverPhoto1.setForeground(new java.awt.Color(51, 0, 51));
@@ -727,7 +755,267 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         bioLabel.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
         kGradientPanel6.add(bioLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 290, 170, 30));
 
+        backButton.setBackground(new java.awt.Color(51, 0, 51));
+        backButton.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        backButton.setForeground(new java.awt.Color(255, 204, 255));
+        backButton.setText("<<");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(backButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 490, 70, 30));
+
+        blockUsers1.setBackground(new java.awt.Color(255, 204, 255));
+        blockUsers1.setForeground(new java.awt.Color(51, 0, 51));
+        blockUsers1.setText("Block Users");
+        blockUsers1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blockUsers1ActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(blockUsers1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 430, 130, -1));
+
         jTabbedPane2.addTab("tab5", kGradientPanel6);
+
+        kGradientPanel7.setkEndColor(new java.awt.Color(51, 0, 51));
+        kGradientPanel7.setkStartColor(new java.awt.Color(255, 204, 255));
+
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+
+        emailTextField1.setBackground(new java.awt.Color(255, 255, 255));
+        emailTextField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        emailTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        emailTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailTextField1ActionPerformed(evt);
+            }
+        });
+
+        passwordField1.setBackground(new java.awt.Color(255, 255, 255));
+        passwordField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        passwordField1.setForeground(new java.awt.Color(0, 0, 0));
+        passwordField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        passwordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordField1ActionPerformed(evt);
+            }
+        });
+
+        usernameTextField.setBackground(new java.awt.Color(255, 255, 255));
+        usernameTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        usernameTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        usernameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usernameTextFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel16.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel16.setText("SignUp");
+
+        jLabel18.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel18.setText("Email");
+
+        jLabel19.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel19.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel19.setText("Password");
+
+        jLabel21.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel21.setText("Username");
+
+        signUpButton.setBackground(new java.awt.Color(51, 0, 51));
+        signUpButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        signUpButton.setText("SignUp");
+        signUpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signUpButtonActionPerformed(evt);
+            }
+        });
+
+        dobTextField.setBackground(new java.awt.Color(255, 255, 255));
+        dobTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        dobTextField.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(51, 0, 51)));
+        dobTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dobTextFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel22.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel22.setText("Date of Birth (YYYY-MM-DD):");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(195, 195, 195)
+                .addComponent(jLabel16)
+                .addContainerGap(189, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel22)
+                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel21)
+                        .addComponent(jLabel19)
+                        .addComponent(jLabel18)
+                        .addComponent(usernameTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(passwordField1)
+                        .addComponent(emailTextField1)
+                        .addComponent(signUpButton, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                        .addComponent(dobTextField)))
+                .addGap(73, 73, 73))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(jLabel16)
+                .addGap(10, 10, 10)
+                .addComponent(jLabel18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(emailTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel21)
+                .addGap(2, 2, 2)
+                .addComponent(usernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22)
+                .addComponent(jLabel19)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(passwordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dobTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(47, 47, 47)
+                .addComponent(signUpButton)
+                .addContainerGap(119, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout kGradientPanel7Layout = new javax.swing.GroupLayout(kGradientPanel7);
+        kGradientPanel7.setLayout(kGradientPanel7Layout);
+        kGradientPanel7Layout.setHorizontalGroup(
+            kGradientPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel7Layout.createSequentialGroup()
+                .addContainerGap(217, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(211, 211, 211))
+        );
+        kGradientPanel7Layout.setVerticalGroup(
+            kGradientPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        jTabbedPane2.addTab("tab6", kGradientPanel7);
+
+        jPanel7.setBackground(new java.awt.Color(255, 204, 255));
+
+        friendSuggestionScroll.setPreferredSize(new java.awt.Dimension(300, 40));
+
+        suggestedFriendsPanel.setBackground(new java.awt.Color(255, 204, 255));
+        suggestedFriendsPanel.setPreferredSize(new java.awt.Dimension(300, 40));
+        suggestedFriendsPanel.setLayout(new javax.swing.BoxLayout(suggestedFriendsPanel, javax.swing.BoxLayout.Y_AXIS));
+        friendSuggestionScroll.setViewportView(suggestedFriendsPanel);
+
+        receivedRequestsPanel.setBackground(new java.awt.Color(255, 204, 255));
+
+        javax.swing.GroupLayout receivedRequestsPanelLayout = new javax.swing.GroupLayout(receivedRequestsPanel);
+        receivedRequestsPanel.setLayout(receivedRequestsPanelLayout);
+        receivedRequestsPanelLayout.setHorizontalGroup(
+            receivedRequestsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+        receivedRequestsPanelLayout.setVerticalGroup(
+            receivedRequestsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 221, Short.MAX_VALUE)
+        );
+
+        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel24.setText("Friend Suggestions");
+
+        jLabel23.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel23.setText("Sent Requests");
+
+        sentRequestsPanel.setBackground(new java.awt.Color(255, 204, 255));
+
+        javax.swing.GroupLayout sentRequestsPanelLayout = new javax.swing.GroupLayout(sentRequestsPanel);
+        sentRequestsPanel.setLayout(sentRequestsPanelLayout);
+        sentRequestsPanelLayout.setHorizontalGroup(
+            sentRequestsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 344, Short.MAX_VALUE)
+        );
+        sentRequestsPanelLayout.setVerticalGroup(
+            sentRequestsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 209, Short.MAX_VALUE)
+        );
+
+        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel25.setText("Incoming Requests");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sentRequestsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel23)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(receivedRequestsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(325, Short.MAX_VALUE))
+            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel7Layout.createSequentialGroup()
+                    .addGap(33, 33, 33)
+                    .addComponent(jLabel24)
+                    .addContainerGap(728, Short.MAX_VALUE)))
+            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel7Layout.createSequentialGroup()
+                    .addGap(275, 275, 275)
+                    .addComponent(jLabel25)
+                    .addContainerGap(485, Short.MAX_VALUE)))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(receivedRequestsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(22, 22, 22)
+                .addComponent(jLabel23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sentRequestsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel7Layout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(jLabel24)
+                    .addContainerGap(489, Short.MAX_VALUE)))
+            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel7Layout.createSequentialGroup()
+                    .addGap(25, 25, 25)
+                    .addComponent(jLabel25)
+                    .addContainerGap(480, Short.MAX_VALUE)))
+        );
+
+        jTabbedPane2.addTab("tab7", jPanel7);
 
         getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 890, 560));
 
@@ -738,13 +1026,14 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         jTabbedPane2.setSelectedIndex(2);
     }//GEN-LAST:event_jLabel9MouseClicked
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        jTabbedPane2.setSelectedIndex(1);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        handleLogin();
+        
+    }//GEN-LAST:event_loginButtonActionPerformed
 
-    private void usernameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameFieldActionPerformed
+    private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_usernameFieldActionPerformed
+    }//GEN-LAST:event_emailTextFieldActionPerformed
 
     private void storyCaptionTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_storyCaptionTextFieldActionPerformed
         // TODO add your handling code here:
@@ -801,9 +1090,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         uploadProfilePicture();
     }//GEN-LAST:event_uploadPfpActionPerformed
 
-    private void blockUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsersActionPerformed
-        uploadCoverPhoto();
-    }//GEN-LAST:event_blockUsersActionPerformed
+    private void removeFriendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFriendButtonActionPerformed
+        handleRemoveFriend();
+    }//GEN-LAST:event_removeFriendButtonActionPerformed
 
     private void uploadCoverPhoto1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadCoverPhoto1ActionPerformed
         uploadCoverPhoto();
@@ -817,6 +1106,393 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         updateBio();
     }//GEN-LAST:event_updateBioActionPerformed
 
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        jTabbedPane2.setSelectedIndex(3);
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void signinLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_signinLabelMouseClicked
+        jTabbedPane2.setSelectedIndex(5);
+    }//GEN-LAST:event_signinLabelMouseClicked
+
+    private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordFieldActionPerformed
+
+    private void emailTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emailTextField1ActionPerformed
+
+    private void passwordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordField1ActionPerformed
+
+    private void usernameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_usernameTextFieldActionPerformed
+
+    private void signUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpButtonActionPerformed
+        handleSignUp();
+    }//GEN-LAST:event_signUpButtonActionPerformed
+
+    private void dobTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dobTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dobTextFieldActionPerformed
+
+    private void blockUsers1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsers1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_blockUsers1ActionPerformed
+
+    private void friendManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_friendManagementButtonActionPerformed
+        jTabbedPane2.setSelectedIndex(6);
+        showSuggestedFriends();
+        showIncomingRequests();
+        
+    }//GEN-LAST:event_friendManagementButtonActionPerformed
+
+    private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        Logout logout = new Logout();
+        logout.logout(currentUser); 
+        jTabbedPane2.setSelectedIndex(0);
+    }//GEN-LAST:event_logoutButtonActionPerformed
+
+    private void handleLogin() {
+        String email = emailTextField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        Validations validations = new Validations();
+
+        // Validate email
+        if (!validations.isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate password
+        if (!validations.isValidPassword(password)) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, digit, and special character.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Perform login
+        boolean loginSuccessful = Login.login(email, password);
+        if (loginSuccessful) {
+            FindUser findUser = new FindUser();
+            JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            this.currentUser = findUser.findUserByEmail(email);
+            jTabbedPane2.setSelectedIndex(1);  // Redirect to dashboard
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid email or password.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } 
+    
+    private void handleSignUp() {
+        String email = emailTextField1.getText().trim();
+        String username = usernameTextField.getText().trim();
+        String password = new String(passwordField1.getPassword()).trim();
+        String dobInput = dobTextField.getText().trim();
+
+        Validations validations = new Validations();
+        LocalDate dateOfBirth;
+
+        // Validate email
+        if (!validations.isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate username
+        if (!validations.isValidUsername(username)) {
+            JOptionPane.showMessageDialog(this, "Invalid username. Username must be alphanumeric and 3-15 characters long.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!validations.loginUsernameValidation(username)) {
+            JOptionPane.showMessageDialog(this, "Username is already taken.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate password
+        if (!validations.isValidPassword(password)) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate date of birth
+        try {
+            dateOfBirth = LocalDate.parse(dobInput);
+            if (!validations.isValidDateOfBirth(dateOfBirth)) {
+                JOptionPane.showMessageDialog(this, "You must be at least 10 years old to sign up.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid date format. Please enter in YYYY-MM-DD format.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Perform sign-up
+        try {
+            SignUp signUp = new SignUp();
+            User newUser = signUp.signup(email, username, password, dateOfBirth);
+            JOptionPane.showMessageDialog(this, "Sign-Up Successful! Welcome, " + newUser.getUsername() + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Redirect to the login page
+            jTabbedPane2.setSelectedIndex(0);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error during sign-up: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void handleBlockUser() {
+        String userToBlockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:", 
+                                                                 "Block User", JOptionPane.PLAIN_MESSAGE);
+
+        if (userToBlockUsername == null || userToBlockUsername.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Find the user to be blocked
+        FindUser findUser = new FindUser(); // Assuming FindUser is a utility to search users
+        User userToBlock = findUser.findUserByUsername(userToBlockUsername);
+
+        if (userToBlock == null) {
+            JOptionPane.showMessageDialog(this, "User not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Perform blocking
+        try {
+            blockManager.block(currentUser, userToBlock); // Assuming `currentUser` is the logged-in user
+            JOptionPane.showMessageDialog(this, "User " + userToBlock.getUsername() + " has been blocked.", 
+                                          "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Optionally refresh the UI or friends list
+            refreshFriendsList(); // Assuming you have a method to refresh the friends list display
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error while blocking user: " + ex.getMessage(), 
+                                          "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void handleRemoveFriend() {
+        String friendUsername = JOptionPane.showInputDialog(this, 
+                "Enter the username of the friend to remove:", 
+                "Remove Friend", 
+                JOptionPane.PLAIN_MESSAGE);
+
+        // Validate input
+        if (friendUsername == null || friendUsername.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                    "Friend's username cannot be empty.", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Find the friend in the current user's friend list
+        User friendToRemove = null;
+        for (User friend : currentUser.getFriends()) {
+            if (friend.getUsername().equalsIgnoreCase(friendUsername)) {
+                friendToRemove = friend;
+                break;
+            }
+        }
+
+        if (friendToRemove == null) {
+            JOptionPane.showMessageDialog(this, 
+                    "Friend not found in your friend list.", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Use the FriendManagerFactory to get a FriendManager instance
+        try {
+            FriendManager friendManager = FriendManagerFactory.createFriendManager();  // Get the instance from the factory
+            friendManager.removeFriend(currentUser, friendToRemove);  // Remove the friend using the factory's manager
+            JOptionPane.showMessageDialog(this, 
+                    "Friend " + friendToRemove.getUsername() + " has been removed.", 
+                    "Success", 
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Refresh the friends list in the UI
+            refreshFriendsList();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, 
+                    "Error while removing friend: " + ex.getMessage(), 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showSuggestedFriends() {
+        // Get the suggested friends using the FriendManager
+        List<User> allUsers = getUsers(); 
+        FriendManager friendManager = FriendManagerFactory.createFriendManager();
+        List<User> suggestedFriends = friendManager.suggestFriends(currentUser, allUsers);  // assuming allUsers is a list of all users
+
+        // Clear existing components
+        suggestedFriendsPanel.removeAll();
+
+        // Create a panel for each suggested friend
+        for (User user : suggestedFriends) {
+            JPanel friendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));  // Use FlowLayout to align the components horizontally
+            friendPanel.setPreferredSize(new Dimension(300, 40));  // Set preferred size for the panel
+
+            // Create a label to show the username
+            JLabel userLabel = new JLabel(user.getUsername());
+            userLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+
+            // Create a button to send a friend request
+            JButton sendRequestButton = new JButton("Send Friend Request");
+            sendRequestButton.addActionListener((java.awt.event.ActionListener) new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    sendFriendRequest(user);  // Send a friend request when the button is pressed
+                }
+            });
+
+            // Add the username and button to the panel
+            friendPanel.add(userLabel);
+            friendPanel.add(sendRequestButton);
+
+            // Add the panel for this suggested friend to the scrollable panel
+            suggestedFriendsPanel.add(friendPanel);
+        }
+
+        // Refresh the panel to reflect the updated list
+        suggestedFriendsPanel.revalidate();
+        suggestedFriendsPanel.repaint();
+    }
+    
+    private void sendFriendRequest(User receiver) {
+        try {
+            // Send the friend request
+            FriendManager friendManager = FriendManagerFactory.createFriendManager();
+            friendManager.sendFriendRequest(currentUser, receiver);  // currentUser is the logged-in user
+
+            // Show success message
+            JOptionPane.showMessageDialog(this, "Friend request sent to " + receiver.getUsername(), "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Optionally refresh the friend request UI
+            refreshSentRequests();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error sending friend request: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void refreshSentRequests() {
+        // Clear existing components in the panel displaying sent requests
+        sentRequestsPanel.removeAll();
+
+        // Re-fetch the list of sent friend requests (from the current user's sent requests)
+        List<FriendRequest> sentRequests = currentUser.getSentRequests();
+
+        // Add each sent request to the panel
+        for (FriendRequest request : sentRequests) {
+            FindUser findUser = new FindUser();
+            User receiver = findUser.findUserById(request.getReceiver());  // Find the user being requested
+
+            // Create a panel for each request
+            JPanel requestPanel = new JPanel();
+            requestPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            // Label to display the receiver's name
+            JLabel receiverLabel = new JLabel("To: " + receiver.getUsername());
+            receiverLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+
+            // Button to show status (or allow canceling)
+            JLabel requestStatusLabel = new JLabel("Status: " + request.getStatus());
+            requestPanel.add(receiverLabel);
+            requestPanel.add(requestStatusLabel);
+
+            // Add the request panel to the sent requests panel
+            sentRequestsPanel.add(requestPanel);
+        }
+
+        // Refresh the panel to reflect the updated list of sent requests
+        sentRequestsPanel.revalidate();
+        sentRequestsPanel.repaint();
+    }
+    
+    private void showIncomingRequests() {
+    // Get the list of received friend requests for the current user
+    List<FriendRequest> receivedRequests = currentUser.getReceivedRequests();  // Assuming `currentUser` is the logged-in user
+
+    // Clear existing components in the panel
+    receivedRequestsPanel.removeAll();
+
+    // Add each incoming request to the panel
+    for (FriendRequest request : receivedRequests) {
+        FindUser findUser = new FindUser();
+        User sender = findUser.findUserById(request.getSender());  // Find the sender by their ID
+
+        // Create a panel to hold the sender's name and buttons
+        JPanel requestPanel = new JPanel();
+        requestPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // Align components horizontally
+        requestPanel.setPreferredSize(new Dimension(300, 40));
+
+        // Label to display the sender's name
+        JLabel senderLabel = new JLabel("From: " + sender.getUsername());
+        senderLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        // Button to accept the request
+        JButton acceptButton = new JButton("Accept");
+        acceptButton.addActionListener((java.awt.event.ActionListener) new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                respondToRequest(sender, request, RequestStatus.ACCEPTED);  // Accept the request
+            }
+        });
+
+        // Button to decline the request
+        JButton declineButton = new JButton("Decline");
+        declineButton.addActionListener((java.awt.event.ActionListener) new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                respondToRequest(sender, request, RequestStatus.DECLINED);  // Decline the request
+            }
+        });
+
+        // Add components to the request panel
+        requestPanel.add(senderLabel);
+        requestPanel.add(acceptButton);
+        requestPanel.add(declineButton);
+
+        // Add the request panel to the received requests panel
+        receivedRequestsPanel.add(requestPanel);
+    }
+
+    // Refresh the panel to reflect the updated list
+    receivedRequestsPanel.revalidate();
+    receivedRequestsPanel.repaint();
+}
+
+    private void respondToRequest(User sender, FriendRequest request, RequestStatus response) {
+        if (response == RequestStatus.ACCEPTED) {
+            // Accept the friend request
+            FriendManager friendManager = FriendManagerFactory.createFriendManager();
+            friendManager.respondToFriendRequest(sender, currentUser, RequestStatus.ACCEPTED);
+            JOptionPane.showMessageDialog(this, "You are now friends with " + sender.getUsername(), "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else if (response == RequestStatus.DECLINED) {
+            // Reject the friend request
+            FriendManager friendManager = FriendManagerFactory.createFriendManager();
+            friendManager.respondToFriendRequest(sender, currentUser, RequestStatus.DECLINED);
+            JOptionPane.showMessageDialog(this, "You rejected the friend request from " + sender.getUsername(), "Rejected", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid response.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Refresh the list of incoming requests
+        showIncomingRequests();  // This refreshes the UI to remove the request or show the updated status
+    }
+       
+    private void refreshFriendsList() {
+        // Logic to refresh the friends list in the UI
+        friendsPanel.removeAll(); // Clear the current list
+        for (User friend : currentUser.getFriends()) {
+            JLabel friendLabel = new JLabel(friend.getUsername());
+            friendsPanel.add(friendLabel);
+        }
+        friendsPanel.revalidate();
+        friendsPanel.repaint();
+    }
+    
         private void uploadImageStory() 
         {
             JFileChooser fileChooser = new JFileChooser();
@@ -1130,7 +1806,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         private void uploadProfilePicture() {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
             int result = fileChooser.showOpenDialog(this);
 
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -1140,37 +1815,43 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 try {
                     // Using ProfileUpdater to update the profile picture
                     ProfileUpdater profileUpdater = new ProfileUpdater();
-                    profileUpdater.updateProfilePhoto(currentUser.getUserId(), filePath); // Update the profile photo
+                    profileUpdater.updateProfilePhoto(currentUser.getUserId(), filePath);
 
                     // Set the profile picture in a circular shape
-                    ImageIcon profilePicIcon = new ImageIcon(filePath);
-                    Image profilePicImage = profilePicIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-                    ImageIcon profilePicCircularIcon = new ImageIcon(createCircularImage(profilePicImage));
-
-                    profilePicLabel.setIcon(profilePicCircularIcon); // Assuming profilePicLabel is the JLabel showing the profile image
-                } catch (IOException e) {
+                    Image circularImage = createCircularImage(filePath); // Updated method takes file path
+                    profilePicLabel.setIcon(new ImageIcon(circularImage)); // Set the circular image in the label
+                } catch (IllegalArgumentException | IOException e) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error updating profile picture.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
         
-        private Image createCircularImage(Image image) {
-            int width = image.getWidth(null);
-            int height = image.getHeight(null);
+        private Image createCircularImage(String imagePath) {
+            try {
+                // Load the image using ImageIO
+                BufferedImage originalImage = ImageIO.read(new File(imagePath));
+                if (originalImage == null) {
+                    throw new IllegalArgumentException("Image file could not be loaded. Ensure the file is a valid image.");
+                }
 
-            if (width <= 0 || height <= 0) {
-                throw new IllegalArgumentException("Invalid image dimensions: width = " + width + ", height = " + height);
+                int width = originalImage.getWidth();
+                int height = originalImage.getHeight();
+
+                int diameter = Math.min(width, height);
+                BufferedImage circularImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = circularImage.createGraphics();
+
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setClip(new Ellipse2D.Float(0, 0, diameter, diameter));
+                g.drawImage(originalImage, 0, 0, diameter, diameter, null);
+                g.dispose();
+
+                return circularImage;
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Failed to load image from path: " + imagePath, e);
             }
-
-            int diameter = Math.min(width, height);
-            BufferedImage circularImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = circularImage.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setClip(new Ellipse2D.Float(0, 0, diameter, diameter));
-            g.drawImage(image, 0, 0, null);
-            g.dispose();
-            return circularImage;
         }
 
         
@@ -1240,6 +1921,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error updating bio.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+       
         
         
         
@@ -1282,24 +1964,35 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JLabel ImagePreview2;
     private javax.swing.JPanel StoriesPanel;
     private javax.swing.JLabel addPostButton;
+    private javax.swing.JButton backButton;
     private javax.swing.JLabel bioLabel;
-    private javax.swing.JButton blockUsers;
+    private javax.swing.JButton blockUsers1;
     private javax.swing.JLabel coverPhotoLabel;
+    private javax.swing.JTextField dobTextField;
+    private javax.swing.JTextField emailTextField;
+    private javax.swing.JTextField emailTextField1;
+    private javax.swing.JButton friendManagementButton;
+    private javax.swing.JScrollPane friendSuggestionScroll;
     private javax.swing.JPanel friendsPanel;
     private javax.swing.JScrollPane friendsScrollPanel;
     private javax.swing.JLabel imagePreview;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1312,11 +2005,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane2;
     private keeptoo.KGradientPanel kGradientPanel1;
     private keeptoo.KGradientPanel kGradientPanel2;
@@ -1324,14 +2016,25 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private keeptoo.KGradientPanel kGradientPanel4;
     private keeptoo.KGradientPanel kGradientPanel5;
     private keeptoo.KGradientPanel kGradientPanel6;
+    private keeptoo.KGradientPanel kGradientPanel7;
+    private javax.swing.JButton loginButton;
+    private javax.swing.JButton logoutButton;
+    private javax.swing.JPasswordField passwordField;
+    private javax.swing.JPasswordField passwordField1;
     private javax.swing.JLabel pfp;
     private javax.swing.JTextField postCaptionTextField;
     private javax.swing.JPanel postPanel;
     private javax.swing.JButton postPostButton;
     private javax.swing.JButton postStoryButton;
     private javax.swing.JLabel profilePicLabel;
+    private javax.swing.JPanel receivedRequestsPanel;
     private javax.swing.JLabel refresh;
+    private javax.swing.JButton removeFriendButton;
+    private javax.swing.JPanel sentRequestsPanel;
+    private javax.swing.JButton signUpButton;
+    private javax.swing.JLabel signinLabel;
     private javax.swing.JTextField storyCaptionTextField;
+    private javax.swing.JPanel suggestedFriendsPanel;
     private javax.swing.JButton updateBio;
     private javax.swing.JButton updatePass;
     private javax.swing.JButton uploadCoverPhoto1;
@@ -1340,6 +2043,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JButton uploadStoryButton;
     private javax.swing.JPanel userPostPanel;
     private javax.swing.JScrollPane userPosts;
-    private javax.swing.JTextField usernameField;
+    private javax.swing.JTextField usernameTextField;
     // End of variables declaration//GEN-END:variables
 }

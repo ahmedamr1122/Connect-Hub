@@ -2,8 +2,8 @@ package Backend.user;
 
 import Backend.content.ContentFactory;
 import Backend.content.Content;
-import Backend.content.Post;
-import Backend.content.Story;
+import Backend.friends.FriendRequest;
+import Backend.friends.RequestStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,55 +23,74 @@ public class UserFactory {
         String bio = obj.getString("Bio");
         String profilePhoto = obj.getString("ProfilePhoto");
         String coverPhoto = obj.getString("CoverPhoto");
-        
 
         // Parse friend IDs
         JSONArray friendsArray = obj.getJSONArray("friends");
         FindUser findUser = new FindUser();
-        List<User> friends = new ArrayList<>();
-        for (int j = 0; j < friendsArray.length(); j++) {
-            String friendId = friendsArray.getString(j);
-            User friend = findUser.findUserById(friendId);
-            if (friend != null) {
+        if (friendsArray != null) {
+            List<User> friends = new ArrayList<>();
+            for (int j = 0; j < friendsArray.length(); j++) {
+                String friendId = friendsArray.getString(j);
+                User friend = new User(friendId, null, null, null, null, null, null, null, null);
                 friends.add(friend);
+
             }
         }
 
         // Parse blocked user IDs
         JSONArray blockedArray = obj.getJSONArray("blocked");
-        List<User> blockedUsers = new ArrayList<>();
-        for (int j = 0; j < blockedArray.length(); j++) {
-            String blockedId = blockedArray.getString(j);
-            User blocked = findUser.findUserById(blockedId);
-            if (blocked != null) {
+        if (blockedArray != null) {
+            List<User> blockedUsers = new ArrayList<>();
+            for (int j = 0; j < blockedArray.length(); j++) {
+                String blockedId = blockedArray.getString(j);
+                User blocked = new User(blockedId, null, null, null, null, null, null, null, null);
+
                 blockedUsers.add(blocked);
+
+            }
+        }
+
+        // Parse Content
+        JSONArray contentArray = obj.getJSONArray("Content");
+        if (contentArray != null) {
+            List<Content> contentList = new ArrayList<>();
+            for (int i = 0; i < contentArray.length(); i++) {
+                Content content = ContentFactory.createContent(obj); // Delegates content creation to the factory.
+                contentList.add(content); // Adds the created content to the list.
             }
         }
         
         
-        // Parse Posts
-        JSONArray postArray = obj.getJSONArray("Post");
-        List<Post> postList = new ArrayList<>();
-        for (int i = 0; i < postArray.length(); i++) {
-                Content post = ContentFactory.createContent(obj); // Delegates content creation to the factory.
-                postList.add((Post)post); // Adds the created content to the list.
+        // Parse Sent Requests
+        JSONArray sentRequestArray = obj.getJSONArray("sentRequest");
+        if (sentRequestArray != null) {
+            List<FriendRequest> sentRequestList = new ArrayList<>();
+
+            for (int i = 0; i < sentRequestArray.length(); i++) {
+                JSONObject sentObj = sentRequestArray.getJSONObject(i);
+                String receiverId = sentObj.getString("receiverId");
+                RequestStatus requestStatus = RequestStatus.valueOf(obj.getString("status"));
+                FriendRequest request = new FriendRequest(userId, receiverId, requestStatus);
+                sentRequestList.add(request);
             }
+        }
         
-        // Parse Story
-        JSONArray storyArray = obj.getJSONArray("Story");
-        List<Story> storyList = new ArrayList<>();
-        for (int i = 0; i < storyArray.length(); i++) {
-                Content story = ContentFactory.createContent(obj); // Delegates content creation to the factory.
-                storyList.add((Story)story); // Adds the created content to the list.
+        // Parse Received Rquests
+        JSONArray receivedRequestArray = obj.getJSONArray("receivedRequest");
+        if (receivedRequestArray != null) {
+
+            List<FriendRequest> receivedRequestList = new ArrayList<>();
+            for (int i = 0; i < receivedRequestArray.length(); i++) {
+                JSONObject sentObj = receivedRequestArray.getJSONObject(i);
+                String senderId = sentObj.getString("receiverId");
+                RequestStatus requestStatus = RequestStatus.valueOf(obj.getString("status"));
+                FriendRequest request = new FriendRequest(senderId, userId, requestStatus);
+                receivedRequestList.add(request);
             }
-        
-        User user = new User(userId,email,username,password,dateOfBirth,status,bio,profilePhoto,coverPhoto);
-        user.setBlocked(blockedUsers);
-        user.setFriends(friends);
-        user.setPosts(postList);
-        user.setStories(storyList);
-        
-        return user;
+
+        }
+
+        return new User(userId, email, username, password, dateOfBirth, status, bio, profilePhoto, coverPhoto);
 
     }
 

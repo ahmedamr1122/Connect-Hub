@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import Backend.content.Post;
 import Backend.content.Story;
+import Backend.friends.FriendRequest;
 import java.util.ArrayList;
 
 // Class to represent a user
@@ -22,8 +23,11 @@ public class User {
     private List<User> Blocked;
     private List<Post> posts;
     private List<Story> stories;
+    private List <FriendRequest> sentRequests;
+    private List <FriendRequest> receivedRequests;
+    private List <User> suggestFriends;
     
-
+    
     public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status,String bio,String profilePhoto,String coverPhoto) {
         this.userId = userId;
         this.email = email;
@@ -38,24 +42,13 @@ public class User {
         this.Blocked = new ArrayList<>();
         this.posts = new ArrayList<>();
         this.stories = new ArrayList<>();
+        this.receivedRequests = new ArrayList<>();
+        this.sentRequests = new ArrayList<>();
+        this.suggestFriends= new ArrayList<>();
         
     }
+    
 
-    public void setFriends(List<User> friends) {
-        this.friends = friends;
-    }
-
-    public void setBlocked(List<User> Blocked) {
-        this.Blocked = Blocked;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    public void setStories(List<Story> stories) {
-        this.stories = stories;
-    }
     
 
     public List<User> getFriends() {
@@ -110,6 +103,14 @@ public class User {
     public List<Story> getStories() {
         return stories;
     }
+
+    public void setCoverPhoto(String coverPhoto) {
+        this.coverPhoto = coverPhoto;
+    }
+    
+    public void setPassword(String password) {
+        this.password = PasswordHashing.hashedPass(password);
+    }
     
 
     public void setBio(String bio) {
@@ -120,15 +121,25 @@ public class User {
         this.profilePhoto = profilePhoto;
     }
 
-    public void setCoverPhoto(String coverPhoto) {
+    public void setCoverPhopo(String coverPhoto) {
         this.coverPhoto = coverPhoto;
     }
     
     public void setStatus(Status status) {
         this.status = status;
     }
- 
-   public void setPassword(String password) {
-        this.password = password;
+
+    public List<FriendRequest> getSentRequests() {
+        return sentRequests;
     }
+
+    public List<FriendRequest> getReceivedRequests() {
+        return receivedRequests;
+    }
+
+    public List<User> getSuggestFriends() {
+        return suggestFriends;
+    }
+    
+    
 }

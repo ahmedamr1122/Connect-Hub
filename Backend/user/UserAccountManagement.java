@@ -5,16 +5,21 @@ import java.util.List;
 
 public class UserAccountManagement{
 
-    private List<User> users;
+    private static List<User> users;
 
 
     public UserAccountManagement() {
-        this.users = new ArrayList<>();
+        this.users = FileManagement.loadUsers("Users.json");
     }
 
-    public List<User> getUsers() {
+    public static List<User> getUsers() {
         return users;
     }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+    
 
     // Method to generate a unique user ID (for simplicity, using username here)
     public String generateUserId() {
