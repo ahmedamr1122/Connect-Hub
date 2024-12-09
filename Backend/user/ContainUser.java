@@ -1,9 +1,11 @@
 package Backend.user;
 
+import java.util.List;
+
 public class ContainUser extends UserAccountManagement {
 
-    public boolean containEmail(String email) {
-        for (User user : super.getUsers()) {
+    public boolean containEmail(String email, List<User> users) {
+        for (User user : users) {
             if (user.getEmail().equals(email)) {
 
                 return true;

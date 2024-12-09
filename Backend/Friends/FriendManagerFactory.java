@@ -1,11 +1,13 @@
 package Backend.friends;
 
+import Backend.user.FileManagement;
+
 public class FriendManagerFactory {
     
     
-    public static FriendManager createFriendManager() {
+    public static FriendManager createFriendManager(FileManagement fileManagement) {
         
-        return new FriendManagerImplement();
+        return new FriendManagerImplement(fileManagement);
         
     }
 }

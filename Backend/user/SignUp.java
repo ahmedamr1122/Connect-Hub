@@ -14,13 +14,16 @@ import java.util.List;
  */
 public class SignUp extends UserAccountManagement {
 
-    private ContainUser CU;
+    private ContainUser CU = new ContainUser();
+    private FileManagement fileManagement = new FileManagement("Users.json");
+    
 
     // Method to Sign up
-    public User signup(String email, String username, String password, LocalDate dateOfBirth) {
-        if (!CU.containEmail(email) || !CU.containUserName(username)) {
-            User newUser = new User(super.generateUserId(), email, username, PasswordHashing.hashedPass(password), dateOfBirth, Status.ONLINE, "", "", "");
+    public User signup(String email, String username, String password, LocalDate dateOfBirth,List<User> users) {
+        if (!CU.containEmail(email,users) || !CU.containUserName(username)) {
+            User newUser = new User(Integer.toString(users.size() + 100), email, username, PasswordHashing.hashedPass(password), dateOfBirth, Status.OFFLINE, "", "", "");
             super.getUsers().add(newUser);
+           
             return newUser;
         }
         return null;

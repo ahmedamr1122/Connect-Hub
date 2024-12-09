@@ -26,74 +26,58 @@ public class FileManagement {
         this.filePath = filePath;
     }
 
-    // load users from a JSON file
-    /* public static List<User> loadUsers(String filePath) {
 
-        List<User> users = new ArrayList<>();
-        try {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                System.out.println("File does not exist. Returning an empty user list.");
-                return users;
-            }
+    public List<User> loadUsers(String filePath) {
+    List<User> users = new ArrayList<>();
 
-            try (Reader reader = new FileReader(filePath)) {
-                JSONArray jsonArray = new JSONArray(new BufferedReader(reader).lines().reduce("", String::concat));
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject obj = jsonArray.getJSONObject(i);
-
-                    User user = UserFactory.createUser(obj);
-
-                    // Add user to the users list
-                    users.add(user);
-                }
-
-                System.out.println("Users loaded successfully from " + filePath);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading users from file: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
+    try {
+        // Check if the file exists
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("File does not exist: " + filePath);
+            return users;  // Return empty list if file does not exist
         }
-        return users;
-    }*/
-    public static List<User> loadUsers(String filePath) {
-        List<User> users = new ArrayList<>();
 
-        try {
-            // Check if the file exists
-            File file = new File(filePath);
-            if (!file.exists()) {
-                System.out.println("File does not exist. Returning an empty user list.");
-                return users;
-            }
+        System.out.println("Loading users from file: " + filePath);
 
-            // Read file content as a single string
-            String fileContent = new String(Files.readAllBytes(Paths.get(filePath)));
+        // Read file content as a single string
+        String fileContent = new String(Files.readAllBytes(Paths.get(filePath)));
 
-            // Parse the content as a JSON array
-            JSONArray jsonArray = new JSONArray(fileContent);
+        // Check if the file content is empty
+        if (fileContent.trim().isEmpty()) {
+            System.out.println("File content is empty. Returning an empty user list.");
+            return users;
+        }
 
-            // Process each JSON object into a User
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
+        // Parse the content as a JSON array
+        JSONArray jsonArray = new JSONArray(fileContent);
 
+        // Process each JSON object into a User
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+
+            try {
                 // Use the provided createUser method to create User objects
                 User user = createUser(obj);
-                users.add(user);
+                users.add(user);  // Add the user to the list
+                System.out.println("Loaded user: " + user.getUsername());
+            } catch (Exception e) {
+                System.err.println("Error creating user from JSON object at index " + i + ": " + e.getMessage());
             }
-
-            System.out.println("Users loaded successfully from " + filePath);
-        } catch (IOException e) {
-            System.err.println("Error reading users from file: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
         }
 
-        return users;
+        System.out.println("Users loaded successfully. Total users: " + users.size());
+    } catch (IOException e) {
+        System.err.println("Error reading users from file: " + e.getMessage());
+    } catch (Exception e) {
+        System.err.println("Unexpected error: " + e.getMessage());
     }
 
-    public static void saveUsers(List<User> users) {
+    return users;
+}
+
+
+    public void saveUsers(List<User> users) {
         try {
             JSONArray jsonArray = new JSONArray();
 
@@ -148,8 +132,8 @@ public class FileManagement {
 
                 
                 // Add stories
-                if(user.getStories()!=null){
                 JSONArray storyArray = new JSONArray();
+                if(user.getStories()!=null){
                 for (Story story : user.getStories()) {
                     JSONObject storyObj = new JSONObject();
                     storyObj.put("contentId", story.getContentId());
@@ -158,7 +142,7 @@ public class FileManagement {
                     storyObj.put("timestamp", story.getTimestamp().toString());
                     storyObj.put("imagePath", story.getImagePath());
                     storyObj.put("type", story.getType());
-                    postArray.put(storyObj);  // This should be storyArray.put() instead of postArray.put()
+                    storyArray.put(storyObj);  // This should be storyArray.put() instead of postArray.put()
                 }
                 obj.put("Story", storyArray);
                 }
@@ -202,99 +186,6 @@ public class FileManagement {
             System.err.println("Unexpected error: " + e.getMessage());
         }
     }
-    /*public static void saveUsers(List<User> users, String filePath) {
-    try {
-        JSONArray jsonArray = new JSONArray();
-
-        for (User  user : users) {
-            JSONObject obj = new JSONObject();
-            obj.put("userId", user.getUserId());
-            obj.put("email", user.getEmail());
-            obj.put("username", user.getUsername());
-            obj.put("dateOfBirth", user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : ""); // Handle null dateOfBirth
-            obj.put("status", user.getStatus().toString());
-            obj.put("Bio", user.getBio() != null ? user.getBio() : "");  // Ensure Bio is added as an empty string if null
-            obj.put("ProfilePhoto", user.getProfilePhoto() != null ? user.getProfilePhoto() : "");  // Handle ProfilePhoto
-            obj.put("CoverPhoto", user.getCoverPhoto() != null ? user.getCoverPhoto() : "");  // Handle CoverPhoto
-
-            // Add friends
-            JSONArray friendsArray = new JSONArray();
-            for (User  friend : user.getFriends()) {
-                JSONObject friendObj = new JSONObject();
-                friendObj.put("FriendId", friend.getUserId());
-                friendsArray.put(friendObj);
-            }
-            obj.put("friends", friendsArray);
-
-            // Add blocked users
-            JSONArray blockedArray = new JSONArray();
-            for (User  blocked : user.getBlocked()) {
-                JSONObject blockedObj = new JSONObject();
-                blockedObj.put("BlockedId", blocked.getUserId());
-                blockedArray.put(blockedObj);
-            }
-            obj.put("blocked", blockedArray);
-
-            // Add posts
-            JSONArray postArray = new JSONArray();
-            for (Post post : user.getPosts()) {
-                JSONObject postObj = new JSONObject();
-                postObj.put("contentId", post.getContentId());
-                postObj.put("authorId", post.getAuthorId());
-                postObj.put("contentText", post.getContentText());
-                postObj.put("timestamp", post.getTimestamp() != null ? post.getTimestamp().toString() : ""); // Handle null timestamp
-                postObj.put("imagePath", post.getImagePath() != null ? post.getImagePath() : "");  // Handle empty image path
-                postObj.put("type", post.getType());
-                postArray.put(postObj);
-            }
-            obj.put("posts", postArray); // Changed from "Post" to "posts"
-
-            // Add stories
-            JSONArray storyArray = new JSONArray();
-            for (Story story : user.getStories()) {
-                JSONObject storyObj = new JSONObject();
-                storyObj.put("contentId", story.getContentId());
-                storyObj.put("authorId", story.getAuthorId());
-                storyObj.put("contentText", story.getContentText());
-                storyObj.put("timestamp", story.getTimestamp() != null ? story.getTimestamp().toString() : ""); // Handle null timestamp
-                storyObj.put("imagePath", story.getImagePath() != null ? story.getImagePath() : "");  // Handle empty image path
-                storyObj.put("type", story.getType());
-                storyObj.put("expiryTime", story.getExpiryTime() != null ? story.getExpiryTime().toString() : "");  // Handle expiryTime (may be null)
-                storyArray.put(storyObj);
-            }
-            obj.put("stories", storyArray); // Changed from "Story" to "stories"
-
-            // Add the sent requests
-            JSONArray sentRequestArray = new JSONArray();
-            for (FriendRequest request : user.getSentRequests()) {
-                JSONObject sentObj = new JSONObject();
-                sentObj.put("receiverId", request.getReceiver());
-                sentObj.put("status", request.getStatus().toString());
-                sentRequestArray.put(sentObj);
-            }
-            obj.put("sentRequests", sentRequestArray); // Changed from "sentRequest" to "sentRequests"
-
-            // Add the received requests
-            JSONArray receiveRequestArray = new JSONArray();
-            for (FriendRequest request : user.getReceivedRequests()) {
-                JSONObject receivedObj = new JSONObject();
-                receivedObj.put("senderId", request.getSender());
-                receivedObj .put("status", request.getStatus().toString());
-                receiveRequestArray.put(receivedObj);
-            }
-            obj.put("receivedRequests", receiveRequestArray); // Changed from "receivedRequest" to "receivedRequests"
-
-            jsonArray.put(obj);
-        }
-
-        // Write the JSON array to the specified file
-        try (FileWriter file = new FileWriter(filePath)) {
-            file.write(jsonArray.toString());
-            file.flush();
-        }
-    } catch (IOException e) {
-        e.printStackTrace(); // Improved error handling
-    }
-}*/
+    
 
 }
