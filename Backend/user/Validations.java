@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
  * @author ahmed
  */
 public class Validations {
+    
 
     // Validate email format
     public boolean isValidEmail(String email) {
@@ -66,14 +67,14 @@ public class Validations {
     }
 
     // Check if email is taken
-    public boolean loginEmailValidation(String email) {
+   /* public boolean loginEmailValidation(String email) {
         ContainUser containUser = new ContainUser();
         if (containUser.containEmail(email)) {
             System.out.println("This email is taken");
             return false;
         }
         return true;
-    }
+    }*/
 
     // Validate bio length
     public void validateBio(String bio) {
