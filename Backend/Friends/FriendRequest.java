@@ -3,7 +3,7 @@ package Backend.friends;
 import Backend.user.User;
 
 public class FriendRequest {
-    
+
     private String sender;
     private String receiver;
     private RequestStatus status;
@@ -37,7 +37,8 @@ public class FriendRequest {
     public void setStatus(RequestStatus status) {
         this.status = status;
     }
-    public static FriendRequest findRequest(User sender,User receiver){
+
+    /*public static FriendRequest findRequest(User sender,User receiver){
             FriendRequest request = null;
             for (int i=0;i< sender.getSentRequests().size();i++){
                 String userId = sender.getSentRequests().get(i).getReceiver();
@@ -47,8 +48,23 @@ public class FriendRequest {
                 }
             }
             return request;
+    }*/
+    public static FriendRequest findSentRequest(User sender, User receiver) {
+        for (FriendRequest request : sender.getSentRequests()) {
+            if (request.getReceiver().equals(receiver.getUserId())) {
+                return request; // Return immediately if found
+            }
+        }
+        return null; // Return null if no matching request is found
     }
-    
-    
-    
+
+    public static FriendRequest findReceivedRequest(User receiver, User sender) {
+        for (FriendRequest request : receiver.getReceivedRequests()) {
+            if (request.getSender().equals(sender.getUserId())) {
+                return request; // Return immediately if found
+            }
+        }
+        return null; // Return null if no matching request is found
+    }
+
 }

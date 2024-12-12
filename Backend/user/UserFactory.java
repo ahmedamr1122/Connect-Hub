@@ -34,7 +34,7 @@ public class UserFactory {
             for (int i = 0; i < friendsArray.length(); i++) {
                 JSONObject friendObj = friendsArray.getJSONObject(i);
                 String friendId = friendObj.getString("FriendId");
-                friends.add(new User(friendId, null, null, null, null, null, null, null, null));
+                friends.add(new User(friendId));
             }
         }
 
@@ -45,7 +45,7 @@ public class UserFactory {
             for (int i = 0; i < blockedArray.length(); i++) {
                 JSONObject blockedObj = blockedArray.getJSONObject(i);
                 String blockedId = blockedObj.getString("BlockedId");
-                blockedUsers.add(new User(blockedId, null, null, null, null, null, null, null, null));
+                blockedUsers.add(new User(blockedId));
             }
         }
 

@@ -22,26 +22,26 @@ public class Profile implements ProfileService {
 
     // Update bio
     @Override
-    public void updateBio(String userId, String newBio) throws IOException {
-        profileUpdater.updateBio(userId, newBio);
+    public void updateBio(String userId, String newBio,List<User> users) throws IOException {
+        profileUpdater.updateBio(userId, newBio,users);
     }
 
     // Update profile photo
     @Override
-    public void updateProfilePhoto(String userId, String newProfilePhotoPath) throws IOException {
-        profileUpdater.updateProfilePhoto(userId, newProfilePhotoPath);
+    public void updateProfilePhoto(String userId, String newProfilePhotoPath, List<User> users) throws IOException {
+        profileUpdater.updateProfilePhoto(userId, newProfilePhotoPath,users);
     }
 
     // Update cover photo
     @Override
-    public void updateCoverPhoto(String userId, String newCoverPhotoPath) throws IOException {
-        profileUpdater.updateCoverPhoto(userId, newCoverPhotoPath);
+    public void updateCoverPhoto(String userId, String newCoverPhotoPath,List<User> users) throws IOException {
+        profileUpdater.updateCoverPhoto(userId, newCoverPhotoPath,users);
     }
 
     // Update password
     @Override
-    public void updatePassword(String userId, String newPassword) throws IOException {
-        profileUpdater.updatePassword(userId, newPassword);
+    public void updatePassword(String userId, String newPassword,List<User> users) throws IOException {
+        profileUpdater.updatePassword(userId, newPassword,users);
     }
 
     // Fetch user's posts

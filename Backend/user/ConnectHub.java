@@ -67,14 +67,14 @@ public class ConnectHub {
     }
     */
      /*  FindUser FU = new FindUser();
-       FileManagement fm = new FileManagement("Users.json");
+       
        List<User> loadedUsers = fm.loadUsers("Users.json");
        UserAccountManagement UAM = new UserAccountManagement();
        UAM.setUsers(loadedUsers);
        UAM.displayUsers();*/
      
        
-       
+       //FileManagement fm = new FileManagement();
        new ConnectHubWindow().setVisible(true);
     
     }

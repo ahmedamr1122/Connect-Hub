@@ -23,12 +23,11 @@ public class User {
     private List<User> Blocked;
     private List<Post> posts;
     private List<Story> stories;
-    private List <FriendRequest> sentRequests;
-    private List <FriendRequest> receivedRequests;
-    private List <User> suggestFriends;
-    
-    
-    public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status,String bio,String profilePhoto,String coverPhoto) {
+    private List<FriendRequest> sentRequests;
+    private List<FriendRequest> receivedRequests;
+    private List<User> suggestFriends;
+
+    public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status, String bio, String profilePhoto, String coverPhoto) {
         this.userId = userId;
         this.email = email;
         this.username = username;
@@ -37,28 +36,67 @@ public class User {
         this.status = status;
         this.bio = bio;
         this.profilePhoto = profilePhoto;
-        this.coverPhoto=coverPhoto;
+        this.coverPhoto = coverPhoto;
         this.friends = new ArrayList<>();
         this.Blocked = new ArrayList<>();
         this.posts = new ArrayList<>();
         this.stories = new ArrayList<>();
         this.receivedRequests = new ArrayList<>();
         this.sentRequests = new ArrayList<>();
-        this.suggestFriends= new ArrayList<>();
-        
-    }
-    
+        this.suggestFriends = new ArrayList<>();
 
-    
+    }
+
+    public User(String userId) {
+        this.userId = userId;
+        this.email = null;
+        this.username = null;
+        this.password = null;
+        this.dateOfBirth = null;
+        this.status = null;
+        this.bio = null;
+        this.profilePhoto = null;
+        this.coverPhoto = null;
+        this.friends = new ArrayList<>();
+        this.Blocked = new ArrayList<>();
+        this.posts = new ArrayList<>();
+        this.stories = new ArrayList<>();
+        this.receivedRequests = new ArrayList<>();
+        this.sentRequests = new ArrayList<>();
+        this.suggestFriends = new ArrayList<>();
+
+    }
 
     public List<User> getFriends() {
         return friends;
     }
 
+    public List<User> getFriends(List<User> users) {
+        List<User> list = new ArrayList<>();
+        FindUser find = new FindUser();
+        User user = null;
+        for (User friend : friends) {
+            user = find.findUserById(friend.getUserId(), users);
+            list.add(user);
+        }
+        return list;
+    }
+
+    public List<User> getBlocked(List<User> users) {
+        List<User> list = new ArrayList<>();
+        FindUser find = new FindUser();
+        User user = null;
+        for (User blocked : Blocked) {
+            user = find.findUserById(blocked.getUserId(), users);
+            list.add(user);
+        }
+        return list;
+    }
+
     public List<User> getBlocked() {
         return Blocked;
     }
-    
+
     // Getters and Setters
     public String getUserId() {
         return userId;
@@ -127,15 +165,14 @@ public class User {
     public void setReceivedRequests(List<FriendRequest> receivedRequests) {
         this.receivedRequests = receivedRequests;
     }
-    
+
     public void setCoverPhoto(String coverPhoto) {
         this.coverPhoto = coverPhoto;
     }
-    
+
     public void setPassword(String password) {
         this.password = PasswordHashing.hashedPass(password);
     }
-    
 
     public void setBio(String bio) {
         this.bio = bio;
@@ -148,7 +185,7 @@ public class User {
     public void setCoverPhopo(String coverPhoto) {
         this.coverPhoto = coverPhoto;
     }
-    
+
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -164,13 +201,13 @@ public class User {
     public List<User> getSuggestFriends() {
         return suggestFriends;
     }
-    public void displayFriends(){
-           for (Post user : posts) {
-            System.out.println("User ID: " + user.getAuthorId()+ ", Username: " + user.getContentId()+ ", Email: " + user.getContentText()+ ", Status: " + user.getImagePath());
+
+    public void displayFriends() {
+        for (Post user : posts) {
+            System.out.println("User ID: " + user.getAuthorId() + ", Username: " + user.getContentId() + ", Email: " + user.getContentText() + ", Status: " + user.getImagePath());
             System.out.println("Password: " + user.getType());
-           
+
         }
     }
-    
-    
+
 }
