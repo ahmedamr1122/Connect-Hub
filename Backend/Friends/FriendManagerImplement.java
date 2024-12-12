@@ -84,7 +84,7 @@ public class FriendManagerImplement implements FriendManager {
             if (!sender.getFriends().contains(receiver)) {
                 sender.getFriends().add(receiver);
                 receiver.getFriends().add(sender);
-                
+
             }
         }
 
@@ -102,12 +102,14 @@ public class FriendManagerImplement implements FriendManager {
 
     @Override
     public void removeFriend(User sender, User friend, List<User> users) {
-        List friendsList1 = sender.getFriends(users);
-        List friendsList2 = friend.getFriends(users);
-        friendsList1.remove(friend);
-        friendsList2.remove(sender);
-        sender.setFriends(friendsList1);
-        friend.setFriends(friendsList1);
+        List<User> friendsList1 = sender.getFriends(users);
+        List<User> friendsList2 = friend.getFriends(users);
+        if (friendsList1.contains(friend)) {
+            friendsList1.remove(friend);
+            friendsList2.remove(sender);
+            sender.setFriends(friendsList1);
+            friend.setFriends(friendsList2);
+        }
 
         fileManagement.saveUsers(users);
     }
@@ -115,6 +117,7 @@ public class FriendManagerImplement implements FriendManager {
     @Override
     public List<User> suggestFriends(User user, List<User> users) {
         List<String> blockedIds = new ArrayList<>();
+        
         for (User blocked : user.getBlocked()) {
             blockedIds.add(blocked.getUserId());
         }
@@ -128,6 +131,9 @@ public class FriendManagerImplement implements FriendManager {
 
         for (User potentialFriend : users) {
             // Skip if the user is the same, is blocked, or is already a friend
+            if(potentialFriend.getBlocked(users).contains(user)){
+                continue;
+            }
             if (potentialFriend.getUserId().equals(user.getUserId())
                     || blockedIds.contains(potentialFriend.getUserId())
                     || friendIds.contains(potentialFriend.getUserId())) {

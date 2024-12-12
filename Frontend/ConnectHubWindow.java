@@ -1404,12 +1404,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
 
         // Find the friend in the current user's friend list
-        User friendToRemove = null;
+       User friendToRemove = null;
         for (User friend : currentUser.getFriends()) {
 
             User user1 = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
             if (user1.getUsername().equalsIgnoreCase(friendUsername)) {
-                friendToRemove = friend;
+                friendToRemove = user1;
                 break;
             }
         }
