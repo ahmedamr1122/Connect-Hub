@@ -21,13 +21,20 @@ import org.json.JSONObject;
 public class FileManagement {
 
     private String filePath;
-
-    public FileManagement(String filePath) {
-        this.filePath = filePath;
+    private static FileManagement instance;
+    
+    public FileManagement() {
+        this.filePath = "Users.json";
     }
 
+    public static FileManagement getInstance() {
+        if (instance == null) {
+            instance = new FileManagement();
+        }
+        return instance;
+    }
 
-    public List<User> loadUsers(String filePath) {
+    public List<User> loadUsers() {
     List<User> users = new ArrayList<>();
 
     try {

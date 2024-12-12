@@ -15,7 +15,7 @@ import java.util.List;
 public class SignUp extends UserAccountManagement {
 
     private ContainUser CU = new ContainUser();
-    private FileManagement fileManagement = new FileManagement("Users.json");
+    private FileManagement fileManagement = FileManagement.getInstance();
     
 
     // Method to Sign up

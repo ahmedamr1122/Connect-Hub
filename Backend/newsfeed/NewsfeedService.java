@@ -26,8 +26,8 @@ public class NewsfeedService {
      * @param user The user whose friends' posts are being fetched.
      * @return A list of posts from friends.
      */
-    public List<Post> getNewsfeedPosts(User user) {
-        return contentService.getFriendPosts(user); // Delegate to ContentService
+    public List<Post> getNewsfeedPosts(User user,List<User> users) {
+        return contentService.getFriendPosts(user,users); // Delegate to ContentService
     }
 
     /**
@@ -35,8 +35,8 @@ public class NewsfeedService {
      * @param user The user whose friends' stories are being fetched.
      * @return A list of active stories from friends.
      */
-    public List<Story> getNewsfeedStories(User user) {
-        return contentService.getFriendStories(user); // Delegate to ContentService
+    public List<Story> getNewsfeedStories(User user,List<User> users) {
+        return contentService.getFriendStories(user,users); // Delegate to ContentService
     }
 
     /**

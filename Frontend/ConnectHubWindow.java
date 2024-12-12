@@ -9,7 +9,8 @@ import Backend.content.ContentService;
 import Backend.content.Post;
 import Backend.content.Story;
 import Backend.friends.FriendManager;
-import Backend.friends.FriendManagerFactory;
+//import Backend.friends.FriendManagerFactory;
+import Backend.friends.FriendManagerImplement;
 import Backend.friends.FriendRequest;
 import Backend.friends.RequestStatus;
 import Backend.profile.ProfileUpdater;
@@ -67,25 +68,28 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private ContentService contentService;
     private User currentUser;
     private BlockManagerImplement blockManager;
-    private FriendManagerFactory friendmanagerfactory;
+    //private FriendManagerFactory friendmanagerfactory;
     private UserAccountManagement userManagement;
     private FileManagement fileManagement;
     private ProfileUpdater profileUpdater;
-    
+    private FindUser findUser;
+
     public ConnectHubWindow() {
         initComponents();
         contentService = new ContentService();  // Assuming ContentService handles User's posts and stories internally
         userManagement = new UserAccountManagement();
-        fileManagement = new FileManagement("Users.json");
-           
-       List<User> loadedUsers = fileManagement.loadUsers("Users.json");
-       
-       //UserAccountManagement userManagement = new UserAccountManagement();
-       userManagement.setUsers(loadedUsers);
-       profileUpdater = new ProfileUpdater(fileManagement );
-       
-       userManagement.displayUsers();
-        
+        fileManagement = FileManagement.getInstance();
+        blockManager = BlockManagerImplement.getInstance();
+        findUser = new FindUser();
+
+        List<User> loadedUsers = fileManagement.loadUsers();
+
+        //UserAccountManagement userManagement = new UserAccountManagement();
+        userManagement.setUsers(loadedUsers);
+        profileUpdater = new ProfileUpdater(fileManagement);
+
+        userManagement.displayUsers();
+
         /*
         
         try {
@@ -93,7 +97,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-       // contentService = ew ContentService("");
+        // contentService = ew ContentService("");
     }
 
     /**
@@ -318,7 +322,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         kGradientPanel1.setLayout(kGradientPanel1Layout);
         kGradientPanel1Layout.setHorizontalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 893, Short.MAX_VALUE)
+            .addGap(0, 900, Short.MAX_VALUE)
             .addGroup(kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel1Layout.createSequentialGroup()
                     .addGap(0, 0, Short.MAX_VALUE)
@@ -678,7 +682,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel5Layout.createSequentialGroup()
                 .addGap(48, 48, 48)
                 .addComponent(postPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 110, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         kGradientPanel5Layout.setVerticalGroup(
@@ -930,7 +934,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         kGradientPanel7Layout.setHorizontalGroup(
             kGradientPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel7Layout.createSequentialGroup()
-                .addContainerGap(217, Short.MAX_VALUE)
+                .addContainerGap(227, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(211, 211, 211))
         );
@@ -996,7 +1000,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                         .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(67, 67, 67))
                     .addGroup(jPanel7Layout.createSequentialGroup()
@@ -1015,7 +1019,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addGroup(jPanel7Layout.createSequentialGroup()
                     .addGap(33, 33, 33)
                     .addComponent(jLabel24)
-                    .addContainerGap(728, Short.MAX_VALUE)))
+                    .addContainerGap(738, Short.MAX_VALUE)))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1046,7 +1050,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("tab7", jPanel7);
 
-        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -30, 890, 590));
+        getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 590));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1057,7 +1061,13 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         handleLogin();
-        
+        try {
+            refreshFriendManagement();
+            refreshNewsfeed();
+        } catch (IOException ex) {
+
+        }
+
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
@@ -1095,7 +1105,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
     private void postPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postPostButtonActionPerformed
         try {
+            load();
             postPost();
+            fileManagement.saveUsers(userManagement.getUsers());
             jTabbedPane2.setSelectedIndex(1);
         } catch (IOException ex) {
             Logger.getLogger(ConnectHubWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -1104,35 +1116,68 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
     private void refreshMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshMouseClicked
         try {
-                    refreshNewsfeed();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            load();
+            refreshFriendManagement();
+            refreshNewsfeed();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_refreshMouseClicked
 
     private void pfpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pfpMouseClicked
         jTabbedPane2.setSelectedIndex(4);
         displayFriendsList(currentUser);
+        bioLabel.setText(currentUser.getBio().trim());
+        ImageIcon coverPhotoIcon = new ImageIcon(currentUser.getCoverPhoto());
+        coverPhotoLabel.setIcon(coverPhotoIcon);
+        if (!currentUser.getProfilePhoto().equals("")) {
+            ImageIcon imageIcon = new ImageIcon(currentUser.getProfilePhoto());
+            Image image = imageIcon.getImage();
+
+            // Get the label's width and height
+            int width = profilePicLabel.getWidth();
+            int height = profilePicLabel.getHeight();
+            // Scale the image to fit within the label's size
+            Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            // Set the scaled image as the label's icon
+            profilePicLabel.setIcon(new ImageIcon(scaledImage));
+            displayUserPosts(currentUser);
+            displayFriendsList(currentUser);
+        }
     }//GEN-LAST:event_pfpMouseClicked
 
     private void uploadPfpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadPfpActionPerformed
+        load();
         uploadProfilePicture();
+        fileManagement.saveUsers(userManagement.getUsers());
     }//GEN-LAST:event_uploadPfpActionPerformed
 
     private void removeFriendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFriendButtonActionPerformed
+        load();
         handleRemoveFriend();
+        fileManagement.saveUsers(userManagement.getUsers());
+
     }//GEN-LAST:event_removeFriendButtonActionPerformed
 
     private void uploadCoverPhoto1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadCoverPhoto1ActionPerformed
+        load();
         uploadCoverPhoto();
+        fileManagement.saveUsers(userManagement.getUsers());
+
     }//GEN-LAST:event_uploadCoverPhoto1ActionPerformed
 
     private void updatePassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePassActionPerformed
+        load();
         updatePassword();
+        fileManagement.saveUsers(userManagement.getUsers());
+
+
     }//GEN-LAST:event_updatePassActionPerformed
 
     private void updateBioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateBioActionPerformed
+        load();
         updateBio();
+        fileManagement.saveUsers(userManagement.getUsers());
     }//GEN-LAST:event_updateBioActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
@@ -1160,7 +1205,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_usernameTextFieldActionPerformed
 
     private void signUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpButtonActionPerformed
+        load();
         handleSignUp();
+        fileManagement.saveUsers(userManagement.getUsers());
     }//GEN-LAST:event_signUpButtonActionPerformed
 
     private void dobTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dobTextFieldActionPerformed
@@ -1168,11 +1215,16 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_dobTextFieldActionPerformed
 
     private void blockUsers1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsers1ActionPerformed
-        // TODO add your handling code here:
+        load();
+        handleBlockUser();
+        fileManagement.saveUsers(userManagement.getUsers());
+
     }//GEN-LAST:event_blockUsers1ActionPerformed
 
     private void friendManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_friendManagementButtonActionPerformed
+        load();
         jTabbedPane2.setSelectedIndex(6);
+
         showSuggestedFriends();
         showIncomingRequests();
         refreshSentRequests();
@@ -1180,7 +1232,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
     private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
         Logout logout = new Logout();
-        logout.logout(currentUser, userManagement.getUsers()); 
+        User user = findUser.findUserById(currentUser.getUserId(), userManagement.getUsers());
+        logout.logout(user, userManagement.getUsers());
         jTabbedPane2.setSelectedIndex(0);
     }//GEN-LAST:event_logoutButtonActionPerformed
 
@@ -1189,6 +1242,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_returnButtonActionPerformed
 
     private void refresh2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refresh2MouseClicked
+        load();
         refreshFriendManagement();
     }//GEN-LAST:event_refresh2MouseClicked
 
@@ -1212,25 +1266,26 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         // Perform login
         Login lo = new Login();
-        boolean loginSuccessful = lo.login(email, password,userManagement.getUsers());
-        FindUser findUser = new FindUser();
+        boolean loginSuccessful = lo.login(email, password, userManagement.getUsers());
+
         System.out.println(loginSuccessful);
-           try{ 
-            User u = findUser.findUserByEmail(email,userManagement.getUsers());
-        System.out.println(findUser.findUserByEmail(email,userManagement.getUsers()).getPassword() +" " + new PasswordHashing().hashedPass(password));
-           }catch(NullPointerException e){
-               JOptionPane.showMessageDialog(this, "Error : " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-           }
+        try {
+            User u = findUser.findUserByEmail(email, userManagement.getUsers());
+            System.out.println(findUser.findUserByEmail(email, userManagement.getUsers()).getPassword() + " " + new PasswordHashing().hashedPass(password));
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(this, "Error : " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         if (loginSuccessful) {
             JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
             fileManagement.saveUsers(userManagement.getUsers());
-            this.currentUser = findUser.findUserByEmail(email,userManagement.getUsers());
+            User current = findUser.findUserByEmail(email, userManagement.getUsers());
+            this.currentUser = current;
             jTabbedPane2.setSelectedIndex(1);  // Redirect to dashboard
         } else {
             JOptionPane.showMessageDialog(this, "Invalid email or password.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    } 
-    
+    }
+
     private void handleSignUp() {
         String email = emailTextField1.getText().trim();
         String username = usernameTextField.getText().trim();
@@ -1277,24 +1332,33 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         // Perform sign-up
         try {
             SignUp signUp = new SignUp();
-            User newUser = signUp.signup(email, username, password, dateOfBirth,userManagement.getUsers());
+            User newUser = signUp.signup(email, username, password, dateOfBirth, userManagement.getUsers());
             userManagement.getUsers().add(newUser);
             fileManagement.saveUsers(userManagement.getUsers());
-           // userManagement.setUsers(fileManagement.loadUsers("Users.json"));
-            
-            
+            // userManagement.setUsers(fileManagement.loadUsers("Users.json"));
+
             JOptionPane.showMessageDialog(this, "Sign-Up Successful! Welcome, " + newUser.getUsername() + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            
+
             // Redirect to the login page
             jTabbedPane2.setSelectedIndex(0);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error during sign-up: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
+    private void load() {
+        userManagement.setUsers(fileManagement.loadUsers());
+        if (currentUser != null) {
+            User user = findUser.findUserById(currentUser.getUserId(), userManagement.getUsers());
+            currentUser = user;
+        }
+
+        //refreshFriendManagement();
+    }
+
     private void handleBlockUser() {
-        String userToBlockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:", 
-                                                                 "Block User", JOptionPane.PLAIN_MESSAGE);
+        String userToBlockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:",
+                "Block User", JOptionPane.PLAIN_MESSAGE);
 
         if (userToBlockUsername == null || userToBlockUsername.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1302,8 +1366,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
 
         // Find the user to be blocked
-        FindUser findUser = new FindUser(); // Assuming FindUser is a utility to search users
-        User userToBlock = findUser.findUserByUsername(userToBlockUsername,userManagement.getUsers());
+        // Assuming FindUser is a utility to search users
+        User userToBlock = findUser.findUserByUsername(userToBlockUsername, userManagement.getUsers());
 
         if (userToBlock == null) {
             JOptionPane.showMessageDialog(this, "User not found.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1312,28 +1376,29 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         // Perform blocking
         try {
-            blockManager.block(currentUser, userToBlock); // Assuming `currentUser` is the logged-in user
-            JOptionPane.showMessageDialog(this, "User " + userToBlock.getUsername() + " has been blocked.", 
-                                          "Success", JOptionPane.INFORMATION_MESSAGE);
+            blockManager.block(currentUser, userToBlock,userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
+            JOptionPane.showMessageDialog(this, "User " + userToBlock.getUsername() + " has been blocked.",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
 
             // Optionally refresh the UI or friends list
             refreshFriendsList(); // Assuming you have a method to refresh the friends list display
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error while blocking user: " + ex.getMessage(), 
-                                          "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error while blocking user: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     private void handleRemoveFriend() {
-        String friendUsername = JOptionPane.showInputDialog(this, 
-                "Enter the username of the friend to remove:", 
-                "Remove Friend", 
+        String friendUsername = JOptionPane.showInputDialog(this,
+                "Enter the username of the friend to remove:",
+                "Remove Friend",
                 JOptionPane.PLAIN_MESSAGE);
 
         // Validate input
         if (friendUsername == null || friendUsername.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                    "Friend's username cannot be empty.", 
-                    "Error", 
+            JOptionPane.showMessageDialog(this,
+                    "Friend's username cannot be empty.",
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -1341,35 +1406,38 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         // Find the friend in the current user's friend list
         User friendToRemove = null;
         for (User friend : currentUser.getFriends()) {
-            if (friend.getUsername().equalsIgnoreCase(friendUsername)) {
+
+            User user1 = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
+            if (user1.getUsername().equalsIgnoreCase(friendUsername)) {
                 friendToRemove = friend;
                 break;
             }
         }
 
         if (friendToRemove == null) {
-            JOptionPane.showMessageDialog(this, 
-                    "Friend not found in your friend list.", 
-                    "Error", 
+            JOptionPane.showMessageDialog(this,
+                    "Friend not found in your friend list.",
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Use the FriendManagerFactory to get a FriendManager instance
         try {
-            FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);  // Get the instance from the factory
-            friendManager.removeFriend(currentUser, friendToRemove,userManagement.getUsers());  // Remove the friend using the factory's manager
-            JOptionPane.showMessageDialog(this, 
-                    "Friend " + friendToRemove.getUsername() + " has been removed.", 
-                    "Success", 
+            FriendManager friendManager = FriendManagerImplement.getInstance();
+            //FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);  // Get the instance from the factory
+            friendManager.removeFriend(currentUser, friendToRemove, userManagement.getUsers());  // Remove the friend using the factory's manager
+            JOptionPane.showMessageDialog(this,
+                    "Friend " + friendToRemove.getUsername() + " has been removed.",
+                    "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
             // Refresh the friends list in the UI
             refreshFriendsList();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, 
-                    "Error while removing friend: " + ex.getMessage(), 
-                    "Error", 
+            JOptionPane.showMessageDialog(this,
+                    "Error while removing friend: " + ex.getMessage(),
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -1378,12 +1446,14 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         showSuggestedFriends();
         showIncomingRequests();
         refreshSentRequests();
+        refreshFriendsList();
     }
-    
+
     private void showSuggestedFriends() {
         // Get the suggested friends using the FriendManager
-        List<User> allUsers = userManagement.getUsers(); 
-        FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
+        List<User> allUsers = userManagement.getUsers();
+        //FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
+        FriendManager friendManager = FriendManagerImplement.getInstance();
         List<User> suggestedFriends = friendManager.suggestFriends(currentUser, allUsers);  // assuming allUsers is a list of all users
 
         // Clear existing components
@@ -1402,8 +1472,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             JButton sendRequestButton = new JButton("Send Friend Request");
             sendRequestButton.addActionListener(e -> sendFriendRequest(user));
 
-
-
             // Add the username and button to the panel
             friendPanel.add(userLabel);
             friendPanel.add(sendRequestButton);
@@ -1416,26 +1484,41 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         suggestedFriendsPanel.revalidate();
         suggestedFriendsPanel.repaint();
     }
-    
-    private void sendFriendRequest(User receiver) {
+
+    public void sendFriendRequest(User receiver) {
         try {
-            // Send the friend request
-            FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
-            FindUser f = new FindUser();
-           // friendManager.sendFriendRequest(f.findUserById("101",userManagement.getUsers()), f.findUserById("100",userManagement.getUsers()),userManagement.getUsers());  // currentUser is the logged-in user
-            friendManager.respondToFriendRequest(f.findUserById("100",userManagement.getUsers()), f.findUserById("101",userManagement.getUsers()), RequestStatus.ACCEPTED, userManagement.getUsers());
-            friendManager.sendFriendRequest(currentUser, receiver,userManagement.getUsers());  // currentUser is the logged-in user
+            // Create a friend request
+            FriendRequest friendRequest = new FriendRequest(currentUser.getUserId(), receiver.getUserId(), RequestStatus.PENDING);
+
+            // Add the request to the sender's sentRequests
+            //currentUser.getSentRequests().add(friendRequest);
+            FriendManager friendManager = FriendManagerImplement.getInstance();
+
+            User user = findUser.findUserById(currentUser.getUserId(), userManagement.getUsers());
+            friendManager.sendFriendRequest(user, receiver, userManagement.getUsers());
+            currentUser = user;
+            // Add the request to the receiver's receivedRequests
+            // receiver.getReceivedRequests().add(friendRequest);
+
+            // Save the updated users list
+            System.out.println("Saving users to file...");
+            fileManagement.saveUsers(userManagement.getUsers());
+            System.out.println("Users saved successfully.");
+
+            System.out.println("Reloading users from file...");
+            userManagement.setUsers(fileManagement.loadUsers());
+            System.out.println("Users reloaded successfully.");
 
             // Show success message
             JOptionPane.showMessageDialog(this, "Friend request sent to " + receiver.getUsername(), "Success", JOptionPane.INFORMATION_MESSAGE);
 
-            // Optionally refresh the friend request UI
+            // Refresh UI
             refreshSentRequests();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error sending friend request: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void refreshSentRequests() {
         // Clear existing components in the panel displaying sent requests
         sentRequestsPanel.removeAll();
@@ -1445,8 +1528,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         // Add each sent request to the panel
         for (FriendRequest request : sentRequests) {
-            FindUser findUser = new FindUser();
-            User receiver = findUser.findUserById(request.getReceiver(),userManagement.getUsers());  // Find the user being requested
+
+            User receiver = findUser.findUserById(request.getReceiver(), userManagement.getUsers());  // Find the user being requested
 
             // Create a panel for each request
             JPanel requestPanel = new JPanel();
@@ -1465,134 +1548,135 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             sentRequestsPanel.add(requestPanel);
         }
         fileManagement.saveUsers(userManagement.getUsers());
-        userManagement.setUsers(fileManagement.loadUsers("Users.json"));
+        //userManagement.setUsers(fileManagement.loadUsers());
         // Refresh the panel to reflect the updated list of sent requests
         sentRequestsPanel.revalidate();
         sentRequestsPanel.repaint();
     }
-    
+
     private void showIncomingRequests() {
-    // Get the list of received friend requests for the current user
-    List<FriendRequest> receivedRequests = currentUser.getReceivedRequests();  // Assuming `currentUser` is the logged-in user
+        // Get the list of received friend requests for the current user
+        List<FriendRequest> receivedRequests = currentUser.getReceivedRequests();  // Assuming `currentUser` is the logged-in user
 
-    // Clear existing components in the panel
-    receivedRequestsPanel.removeAll();
+        // Clear existing components in the panel
+        receivedRequestsPanel.removeAll();
 
-    // Add each incoming request to the panel
-    for (FriendRequest request : receivedRequests) {
-        FindUser findUser = new FindUser();
-        User sender = findUser.findUserById(request.getSender(),userManagement.getUsers());  // Find the sender by their ID
+        // Add each incoming request to the panel
+        for (FriendRequest request : receivedRequests) {
 
-        // Create a panel to hold the sender's name and buttons
-        JPanel requestPanel = new JPanel();
-        requestPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // Align components horizontally
-        requestPanel.setPreferredSize(new Dimension(300, 40));
+            User sender = findUser.findUserById(request.getSender(), userManagement.getUsers());  // Find the sender by their ID
 
-        // Label to display the sender's name
-        JLabel senderLabel = new JLabel("From: " + sender.getUsername());
-        senderLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+            // Create a panel to hold the sender's name and buttons
+            JPanel requestPanel = new JPanel();
+            requestPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // Align components horizontally
+            requestPanel.setPreferredSize(new Dimension(300, 40));
 
-        // Button to accept the request
-        JButton acceptButton = new JButton("Accept");
-        acceptButton.addActionListener((java.awt.event.ActionListener) new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                respondToRequest(sender, request, RequestStatus.ACCEPTED);  // Accept the request
-            }
-        });
+            // Label to display the sender's name
+            JLabel senderLabel = new JLabel("From: " + sender.getUsername());
+            senderLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        // Button to decline the request
-        JButton declineButton = new JButton("Decline");
-        declineButton.addActionListener((java.awt.event.ActionListener) new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                respondToRequest(sender, request, RequestStatus.DECLINED);  // Decline the request
-            }
-        });
+            // Button to accept the request
+            JButton acceptButton = new JButton("Accept");
 
-        // Add components to the request panel
-        requestPanel.add(senderLabel);
-        requestPanel.add(acceptButton);
-        requestPanel.add(declineButton);
+            acceptButton.addActionListener(e -> respondToRequest(sender, request, RequestStatus.ACCEPTED));
 
-        // Add the request panel to the received requests panel
-        receivedRequestsPanel.add(requestPanel);
+            // Button to decline the request
+            JButton declineButton = new JButton("Decline");
+            declineButton.addActionListener(e -> respondToRequest(sender, request, RequestStatus.DECLINED));
+
+            // Add components to the request panel
+            requestPanel.add(senderLabel);
+            requestPanel.add(acceptButton);
+            requestPanel.add(declineButton);
+
+            // Add the request panel to the received requests panel
+            receivedRequestsPanel.add(requestPanel);
+        }
+
+        // Refresh the panel to reflect the updated list
+        receivedRequestsPanel.revalidate();
+        receivedRequestsPanel.repaint();
     }
 
-    // Refresh the panel to reflect the updated list
-    receivedRequestsPanel.revalidate();
-    receivedRequestsPanel.repaint();
-}
-
     private void respondToRequest(User sender, FriendRequest request, RequestStatus response) {
+       
+        User user = currentUser;
         if (response == RequestStatus.ACCEPTED) {
             // Accept the friend request
-            FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
-            friendManager.respondToFriendRequest(sender, currentUser, RequestStatus.ACCEPTED,userManagement.getUsers());
+            //FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
+            FriendManager friendManager = FriendManagerImplement.getInstance();
+
+            friendManager.respondToFriendRequest(sender, user, RequestStatus.ACCEPTED, userManagement.getUsers());
             JOptionPane.showMessageDialog(this, "You are now friends with " + sender.getUsername(), "Success", JOptionPane.INFORMATION_MESSAGE);
         } else if (response == RequestStatus.DECLINED) {
             // Reject the friend request
-            FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
-            friendManager.respondToFriendRequest(sender, currentUser, RequestStatus.DECLINED,userManagement.getUsers());
+            //FriendManager friendManager = FriendManagerFactory.createFriendManager(fileManagement);
+            FriendManager friendManager = FriendManagerImplement.getInstance();
+            friendManager.respondToFriendRequest(sender, user, RequestStatus.DECLINED, userManagement.getUsers());
             JOptionPane.showMessageDialog(this, "You rejected the friend request from " + sender.getUsername(), "Rejected", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Invalid response.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
+        currentUser = user;
         // Refresh the list of incoming requests
+       // currentUser.getReceivedRequests().remove(request);
+       
+
         showIncomingRequests();  // This refreshes the UI to remove the request or show the updated status
     }
-       
+
     private void refreshFriendsList() {
         // Logic to refresh the friends list in the UI
         friendsPanel.removeAll(); // Clear the current list
         for (User friend : currentUser.getFriends()) {
-            JLabel friendLabel = new JLabel(friend.getUsername());
+
+            User user = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
+            JLabel friendLabel = new JLabel(user.getUsername());
             friendsPanel.add(friendLabel);
         }
         friendsPanel.revalidate();
         friendsPanel.repaint();
     }
-    
-        private void uploadImageStory() 
-        {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-            // Filter for image files only (jpg, png)
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+    private void uploadImageStory() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-            int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                selectedImagePath = selectedFile.getAbsolutePath();
-                imagePreview.setText(""); // Clear the "No image selected" text
+        // Filter for image files only (jpg, png)
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
 
-                // Display the image in the label (resized for preview)
-                ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
-                imagePreview.setIcon(icon);
-            }
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            selectedImagePath = selectedFile.getAbsolutePath();
+            imagePreview.setText(""); // Clear the "No image selected" text
+
+            // Display the image in the label (resized for preview)
+            ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
+            imagePreview.setIcon(icon);
         }
-        private void uploadImagePost() 
-        {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    }
 
-            // Filter for image files only (jpg, png)
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+    private void uploadImagePost() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-            int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                selectedImagePath = selectedFile.getAbsolutePath();
-                ImagePreview2.setText(""); // Clear the "No image selected" text
+        // Filter for image files only (jpg, png)
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
 
-                // Display the image in the label (resized for preview)
-                ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
-                ImagePreview2.setIcon(icon);
-            }
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            selectedImagePath = selectedFile.getAbsolutePath();
+            ImagePreview2.setText(""); // Clear the "No image selected" text
+
+            // Display the image in the label (resized for preview)
+            ImageIcon icon = new ImageIcon(new ImageIcon(selectedImagePath).getImage().getScaledInstance(200, 150, Image.SCALE_SMOOTH));
+            ImagePreview2.setIcon(icon);
         }
-        
-        
-        private void postStory() throws IOException {
+    }
+
+    private void postStory() throws IOException {
         String caption = storyCaptionTextField.getText().trim();
 
         if (selectedImagePath == null || selectedImagePath.isEmpty()) {
@@ -1601,7 +1685,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
 
         // Call createStory method from ContentService
-        contentService.createStory(currentUser, caption, selectedImagePath);
+        contentService.createStory(currentUser, caption, selectedImagePath, userManagement.getUsers());
         JOptionPane.showMessageDialog(this, "Story posted successfully!");
         // Clear inputs
         storyCaptionTextField.setText("");
@@ -1609,70 +1693,71 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         imagePreview.setText("No image selected");
         selectedImagePath = null;
         refreshNewsfeed();
-       }
-        private void postPost() throws IOException {
-            String caption = postCaptionTextField.getText().trim();
+    }
 
-            if (selectedImagePath == null || selectedImagePath.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please upload an image for the Post.");
-                return;
-            }
+    private void postPost() throws IOException {
+        String caption = postCaptionTextField.getText().trim();
 
-            // Call createStory method from ContentService
-            contentService.createPost(currentUser , caption, selectedImagePath);
-            JOptionPane.showMessageDialog(this, "Post added successfully!");
-            // Clear inputs
-            postCaptionTextField.setText("");
-            ImagePreview2.setIcon(null);
-            ImagePreview2.setText("No image selected");
-            selectedImagePath = null;
-            refreshNewsfeed();
-            displayUserPosts(currentUser);
-            
-       }
-        
-        private void refreshNewsfeed() throws IOException {
-            // Clear existing components
-            StoriesPanel.removeAll();
-            postPanel.removeAll();
-
-            // Fetch and update active stories
-            List<Story> activeStories = contentService.getFriendStories(currentUser);
-            activeStories.addAll(currentUser.getStories());
-            for (Story story : activeStories) {
-                addStoryToPanel(story);
-            }
-
-            // Fetch and update posts
-            List<Post> posts = contentService.getFriendPosts(currentUser);
-            posts.addAll(currentUser.getPosts());
-            for (Post post : posts) {
-                addPostToPanel(post);
-            }
-            fileManagement.saveUsers(userManagement.getUsers());
-            userManagement.setUsers(fileManagement.loadUsers("Users.json"));
-            // Refresh panels
-            StoriesPanel.revalidate();
-            StoriesPanel.repaint();
-            postPanel.revalidate();
-            postPanel.repaint();
+        if (selectedImagePath == null || selectedImagePath.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please upload an image for the Post.");
+            return;
         }
-        
-        private void addStoryToPanel(Story story) {
-            JLabel storyLabel = new JLabel(new ImageIcon(new ImageIcon(story.getImagePath()).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
-            storyLabel.setToolTipText(story.getContentText());
-            storyLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            // Open story details on click
-            storyLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    new displayStoryDetails(story).setVisible(true);
-                }
-            });
+        // Call createStory method from ContentService
+        contentService.createPost(currentUser, caption, selectedImagePath, userManagement.getUsers());
+        JOptionPane.showMessageDialog(this, "Post added successfully!");
+        // Clear inputs
+        postCaptionTextField.setText("");
+        ImagePreview2.setIcon(null);
+        ImagePreview2.setText("No image selected");
+        selectedImagePath = null;
+        refreshNewsfeed();
+        displayUserPosts(currentUser);
 
-            StoriesPanel.add(storyLabel);
+    }
+
+    private void refreshNewsfeed() throws IOException {
+        // Clear existing components
+        StoriesPanel.removeAll();
+        postPanel.removeAll();
+
+        // Fetch and update active stories
+        List<Story> activeStories = contentService.getFriendStories(currentUser, userManagement.getUsers());
+        activeStories.addAll(currentUser.getStories());
+        for (Story story : activeStories) {
+            addStoryToPanel(story);
         }
+
+        // Fetch and update posts
+        List<Post> posts = contentService.getFriendPosts(currentUser, userManagement.getUsers());
+        posts.addAll(currentUser.getPosts());
+        for (Post post : posts) {
+            addPostToPanel(post);
+        }
+//        fileManagement.saveUsers(userManagement.getUsers());
+//        userManagement.setUsers(fileManagement.loadUsers());
+        // Refresh panels
+        StoriesPanel.revalidate();
+        StoriesPanel.repaint();
+        postPanel.revalidate();
+        postPanel.repaint();
+    }
+
+    private void addStoryToPanel(Story story) {
+        JLabel storyLabel = new JLabel(new ImageIcon(new ImageIcon(story.getImagePath()).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+        storyLabel.setToolTipText(story.getContentText());
+        storyLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Open story details on click
+        storyLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new displayStoryDetails(story).setVisible(true);
+            }
+        });
+
+        StoriesPanel.add(storyLabel);
+    }
 
     private JPanel createPostItemPanel(Post post) {
         JPanel postItemPanel = new JPanel();
@@ -1718,153 +1803,152 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
             Image scaledImage = originalImage.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
             imageLabel.setIcon(new ImageIcon(scaledImage));
+        }
+
+        // Add the header panel (user name) to the post
+        postItemPanel.add(headerPanel, BorderLayout.NORTH);
+
+        // Add the image label to the center of the panel
+        postItemPanel.add(imageLabel, BorderLayout.CENTER);
+
+        // Add the content label (caption) at the bottom of the post
+        postItemPanel.add(contentLabel, BorderLayout.SOUTH);
+
+        return postItemPanel;
     }
 
-    // Add the header panel (user name) to the post
-    postItemPanel.add(headerPanel, BorderLayout.NORTH);
+    private void displayUserPosts(User currentUser) {
 
-    // Add the image label to the center of the panel
-    postItemPanel.add(imageLabel, BorderLayout.CENTER);
-
-    // Add the content label (caption) at the bottom of the post
-    postItemPanel.add(contentLabel, BorderLayout.SOUTH);
-
-    return postItemPanel;
-}
-   
-        private void displayUserPosts(User currentUser) {
-            
-            userPostPanel.removeAll();
-            for (Post post : currentUser.getPosts()) {
-                addPostToUserPanel(post);
-            }
-            userPostPanel.revalidate();
-            userPostPanel.repaint();
+        userPostPanel.removeAll();
+        for (Post post : currentUser.getPosts()) {
+            addPostToUserPanel(post);
         }
-    
-        private void addPostToPanel(Post post) {
-            JPanel postItemPanel = createPostItemPanel(post);  // Reuse the helper method
-            postPanel.add(postItemPanel);
-        }
+        userPostPanel.revalidate();
+        userPostPanel.repaint();
+    }
 
-        private void addPostToUserPanel(Post post) {
-            JPanel postItemUserPanel = createPostItemPanel(post);  // Reuse the helper method
-            userPostPanel.add(postItemUserPanel);
-        }
-        
-        private void displayFriendsList(User currentUser){
-            for (User friend : currentUser.getFriends()) {
-                JLabel friendLabel = new JLabel(friend.getUsername() + " (" + friend.getStatus() + ")");
-                friendsPanel.add(friendLabel);
-            }
-        }
-        
-private void uploadProfilePicture() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    int result = fileChooser.showOpenDialog(this);
+    private void addPostToPanel(Post post) {
+        JPanel postItemPanel = createPostItemPanel(post);  // Reuse the helper method
+        postPanel.add(postItemPanel);
+    }
 
-    if (result == JFileChooser.APPROVE_OPTION) {
-        File selectedFile = fileChooser.getSelectedFile();
-        String filePath = selectedFile.getAbsolutePath();
+    private void addPostToUserPanel(Post post) {
+        JPanel postItemUserPanel = createPostItemPanel(post);  // Reuse the helper method
+        userPostPanel.add(postItemUserPanel);
+    }
 
-        try {
-            // Using ProfileUpdater to update the profile picture
-            //profileUpdater = new ProfileUpdater(fileManagement , userManagement.getUsers());
-            profileUpdater.updateProfilePhoto(currentUser.getUserId(), filePath, userManagement.getUsers());
+    private void displayFriendsList(User currentUser) {
+        friendsPanel.removeAll();
+        for (User friend : currentUser.getFriends()) {
 
-            // Load the image and scale it to fit within the label's boundaries
-            ImageIcon imageIcon = new ImageIcon(filePath);
-            Image image = imageIcon.getImage();
-
-            // Get the label's width and height
-            int width = profilePicLabel.getWidth();
-            int height = profilePicLabel.getHeight();
-
-            // Scale the image to fit within the label's size
-            Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-
-            // Set the scaled image as the label's icon
-            profilePicLabel.setIcon(new ImageIcon(scaledImage));
-
-        } catch (IllegalArgumentException | IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            User user = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
+            JLabel friendLabel = new JLabel(user.getUsername() + " (" + user.getStatus() + ")");
+            friendsPanel.add(friendLabel);
         }
     }
-}
 
-        
-        private void uploadCoverPhoto() {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
-            int result = fileChooser.showOpenDialog(this);
+    private void uploadProfilePicture() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int result = fileChooser.showOpenDialog(this);
 
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                String filePath = selectedFile.getAbsolutePath();
-
-                try {
-                    // Using ProfileUpdater to update the cover photo
-                    //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
-                    profileUpdater.updateCoverPhoto(currentUser.getUserId(), filePath, userManagement.getUsers()); // Update the cover photo
-
-                    // Update the cover photo on the profile page
-                    ImageIcon coverPhotoIcon = new ImageIcon(filePath);
-                    coverPhotoLabel.setIcon(coverPhotoIcon); // Assuming coverPhotoLabel is the JLabel for the cover photo
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error updating cover photo.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-        
-        private void updatePassword() {
-            String newPassword = JOptionPane.showInputDialog(this, "Enter new password:");
-            if (newPassword != null && !newPassword.isEmpty()) {
-                try {
-                    //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
-                    profileUpdater.updatePassword(currentUser.getUserId(), newPassword, userManagement.getUsers()); // Update the password in the user profile
-                    JOptionPane.showMessageDialog(this, "Password updated successfully!");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error updating password.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        
-        private void updateBio() {
-            // Prompt the user to enter a new bio
-            String newBio = JOptionPane.showInputDialog(this, "Enter your new bio:", "Update Bio", JOptionPane.PLAIN_MESSAGE);
-
-            // Check if the user canceled or entered an empty bio
-            if (newBio == null || newBio.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Bio cannot be empty or cancelled.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
 
             try {
-                // Use ProfileUpdater to update the bio
-                //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
-                profileUpdater.updateBio(currentUser.getUserId(), newBio.trim(), userManagement.getUsers()); // Update the bio for the current user
+                // Using ProfileUpdater to update the profile picture
+                //profileUpdater = new ProfileUpdater(fileManagement , userManagement.getUsers());
+                profileUpdater.updateProfilePhoto(currentUser.getUserId(), filePath, userManagement.getUsers());
 
-                // Optionally, update the displayed bio on the profile page
-                JOptionPane.showMessageDialog(this, "Bio updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                // Load the image and scale it to fit within the label's boundaries
+                ImageIcon imageIcon = new ImageIcon(filePath);
+                Image image = imageIcon.getImage();
 
-                // Update the displayed bio in the UI (e.g., a label)
-                bioLabel.setText(newBio.trim());  // Assuming bioLabel is a JLabel showing the bio
-            } catch (IOException e) {
+                // Get the label's width and height
+                int width = profilePicLabel.getWidth();
+                int height = profilePicLabel.getHeight();
+
+                // Scale the image to fit within the label's size
+                Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+                // Set the scaled image as the label's icon
+                profilePicLabel.setIcon(new ImageIcon(scaledImage));
+
+            } catch (IllegalArgumentException | IOException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error updating bio.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-       
-        
-        
-        
+    }
+
+    private void uploadCoverPhoto() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image files", "jpg", "png", "jpeg", "gif"));
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
+
+            try {
+                // Using ProfileUpdater to update the cover photo
+                //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
+                profileUpdater.updateCoverPhoto(currentUser.getUserId(), filePath, userManagement.getUsers()); // Update the cover photo
+
+                // Update the cover photo on the profile page
+                ImageIcon coverPhotoIcon = new ImageIcon(filePath);
+                coverPhotoLabel.setIcon(coverPhotoIcon); // Assuming coverPhotoLabel is the JLabel for the cover photo
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating cover photo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void updatePassword() {
+        String newPassword = JOptionPane.showInputDialog(this, "Enter new password:");
+        if (newPassword != null && !newPassword.isEmpty()) {
+            try {
+                //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
+                profileUpdater.updatePassword(currentUser.getUserId(), newPassword, userManagement.getUsers()); // Update the password in the user profile
+                JOptionPane.showMessageDialog(this, "Password updated successfully!");
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating password.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateBio() {
+        // Prompt the user to enter a new bio
+        String newBio = JOptionPane.showInputDialog(this, "Enter your new bio:", "Update Bio", JOptionPane.PLAIN_MESSAGE);
+
+        // Check if the user canceled or entered an empty bio
+        if (newBio == null || newBio.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Bio cannot be empty or cancelled.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Use ProfileUpdater to update the bio
+            //ProfileUpdater profileUpdater = new ProfileUpdater(fileManagement ,userManagement.getUsers());
+            profileUpdater.updateBio(currentUser.getUserId(), newBio.trim(), userManagement.getUsers()); // Update the bio for the current user
+
+            // Optionally, update the displayed bio on the profile page
+            JOptionPane.showMessageDialog(this, "Bio updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Update the displayed bio in the UI (e.g., a label)
+            bioLabel.setText(newBio.trim());  // Assuming bioLabel is a JLabel showing the bio
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating bio.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     /**
      * @param args the command line arguments
      */

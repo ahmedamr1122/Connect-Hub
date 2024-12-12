@@ -1,6 +1,6 @@
 package Backend.friends;
 
-import Backend.user.FileManagement;
+/*import Backend.user.FileManagement;
 
 public class FriendManagerFactory {
     
@@ -10,4 +10,4 @@ public class FriendManagerFactory {
         return new FriendManagerImplement(fileManagement);
         
     }
-}
+}*/
