@@ -171,7 +171,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         updateBio = new javax.swing.JButton();
         bioLabel = new javax.swing.JLabel();
         backButton = new javax.swing.JButton();
-        blockUsers1 = new javax.swing.JButton();
+        unBlockUsers1 = new javax.swing.JButton();
+        blockUsers2 = new javax.swing.JButton();
         kGradientPanel7 = new keeptoo.KGradientPanel();
         jPanel6 = new javax.swing.JPanel();
         emailTextField1 = new javax.swing.JTextField();
@@ -746,7 +747,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 removeFriendButtonActionPerformed(evt);
             }
         });
-        kGradientPanel6.add(removeFriendButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, 130, -1));
+        kGradientPanel6.add(removeFriendButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 370, 130, -1));
 
         uploadCoverPhoto1.setBackground(new java.awt.Color(255, 204, 255));
         uploadCoverPhoto1.setForeground(new java.awt.Color(51, 0, 51));
@@ -792,15 +793,25 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         });
         kGradientPanel6.add(backButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 490, 70, 30));
 
-        blockUsers1.setBackground(new java.awt.Color(255, 204, 255));
-        blockUsers1.setForeground(new java.awt.Color(51, 0, 51));
-        blockUsers1.setText("Block Users");
-        blockUsers1.addActionListener(new java.awt.event.ActionListener() {
+        unBlockUsers1.setBackground(new java.awt.Color(255, 204, 255));
+        unBlockUsers1.setForeground(new java.awt.Color(51, 0, 51));
+        unBlockUsers1.setText("Un Block User");
+        unBlockUsers1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blockUsers1ActionPerformed(evt);
+                unBlockUsers1ActionPerformed(evt);
             }
         });
-        kGradientPanel6.add(blockUsers1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 430, 130, -1));
+        kGradientPanel6.add(unBlockUsers1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 430, 130, -1));
+
+        blockUsers2.setBackground(new java.awt.Color(255, 204, 255));
+        blockUsers2.setForeground(new java.awt.Color(51, 0, 51));
+        blockUsers2.setText("Block Users");
+        blockUsers2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blockUsers2ActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(blockUsers2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, 130, -1));
 
         jTabbedPane2.addTab("tab5", kGradientPanel6);
 
@@ -1214,12 +1225,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_dobTextFieldActionPerformed
 
-    private void blockUsers1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsers1ActionPerformed
+    private void unBlockUsers1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unBlockUsers1ActionPerformed
         load();
-        handleBlockUser();
+        handleUnBlockUser();
         fileManagement.saveUsers(userManagement.getUsers());
 
-    }//GEN-LAST:event_blockUsers1ActionPerformed
+    }//GEN-LAST:event_unBlockUsers1ActionPerformed
 
     private void friendManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_friendManagementButtonActionPerformed
         load();
@@ -1245,6 +1256,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         load();
         refreshFriendManagement();
     }//GEN-LAST:event_refresh2MouseClicked
+
+    private void blockUsers2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsers2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_blockUsers2ActionPerformed
 
     private void handleLogin() {
         String email = emailTextField.getText().trim();
@@ -1387,6 +1402,37 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+        private void handleUnBlockUser() {
+        String userToUnBlockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:",
+                "Block User", JOptionPane.PLAIN_MESSAGE);
+
+        if (userToUnBlockUsername == null || userToUnBlockUsername.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Find the user to be blocked
+        // Assuming FindUser is a utility to search users
+        User userToUnBlock = findUser.findUserByUsername(userToUnBlockUsername, userManagement.getUsers());
+
+        if (userToUnBlock == null) {
+            JOptionPane.showMessageDialog(this, "User not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Perform blocking
+        try {
+            blockManager.unBlock(currentUser, userToUnBlock,userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
+            JOptionPane.showMessageDialog(this, "User " + userToUnBlock.getUsername() + " has been unblocked.",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Optionally refresh the UI or friends list
+            refreshFriendsList(); // Assuming you have a method to refresh the friends list display
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error while blocking user: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void handleRemoveFriend() {
         String friendUsername = JOptionPane.showInputDialog(this,
@@ -1404,12 +1450,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
 
         // Find the friend in the current user's friend list
-        User friendToRemove = null;
+       User friendToRemove = null;
         for (User friend : currentUser.getFriends()) {
 
             User user1 = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
             if (user1.getUsername().equalsIgnoreCase(friendUsername)) {
-                friendToRemove = friend;
+                friendToRemove = user1;
                 break;
             }
         }
@@ -1990,7 +2036,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JLabel addPostButton;
     private javax.swing.JButton backButton;
     private javax.swing.JLabel bioLabel;
-    private javax.swing.JButton blockUsers1;
+    private javax.swing.JButton blockUsers2;
     private javax.swing.JLabel coverPhotoLabel;
     private javax.swing.JTextField dobTextField;
     private javax.swing.JTextField emailTextField;
@@ -2063,6 +2109,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JLabel signinLabel;
     private javax.swing.JTextField storyCaptionTextField;
     private javax.swing.JPanel suggestedFriendsPanel;
+    private javax.swing.JButton unBlockUsers1;
     private javax.swing.JButton updateBio;
     private javax.swing.JButton updatePass;
     private javax.swing.JButton uploadCoverPhoto1;
