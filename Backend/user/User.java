@@ -1,10 +1,12 @@
 package Backend.user;
 
+import Backend.Group.Group;
 import java.time.LocalDate;
 import java.util.List;
 import Backend.content.Post;
 import Backend.content.Story;
 import Backend.friends.FriendRequest;
+import Backend.notification.Notification;
 import java.util.ArrayList;
 
 // Class to represent a user
@@ -25,7 +27,10 @@ public class User {
     private List<Story> stories;
     private List<FriendRequest> sentRequests;
     private List<FriendRequest> receivedRequests;
-    private List<User> suggestFriends;
+    private List<Group> ownedGroups;
+    private List<Group> joinedGroups;
+    private List<Notification> notifications;
+    
 
     public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status, String bio, String profilePhoto, String coverPhoto) {
         this.userId = userId;
@@ -43,7 +48,9 @@ public class User {
         this.stories = new ArrayList<>();
         this.receivedRequests = new ArrayList<>();
         this.sentRequests = new ArrayList<>();
-        this.suggestFriends = new ArrayList<>();
+        this.ownedGroups = new ArrayList<>();
+        this.joinedGroups = new ArrayList<>();
+        this.notifications = new ArrayList<>();
 
     }
 
@@ -63,7 +70,9 @@ public class User {
         this.stories = new ArrayList<>();
         this.receivedRequests = new ArrayList<>();
         this.sentRequests = new ArrayList<>();
-        this.suggestFriends = new ArrayList<>();
+        this.ownedGroups = new ArrayList<>();
+        this.joinedGroups = new ArrayList<>();
+        this.notifications = new ArrayList<>();
 
     }
 
@@ -198,9 +207,6 @@ public class User {
         return receivedRequests;
     }
 
-    public List<User> getSuggestFriends() {
-        return suggestFriends;
-    }
 
     public void displayFriends() {
         for (Post user : posts) {
@@ -208,6 +214,68 @@ public class User {
             System.out.println("Password: " + user.getType());
 
         }
+    }
+    
+    // Add a group to the owned groups
+    public void addOwnedGroup(Group group) {
+        if (!ownedGroups.contains(group)) {
+            ownedGroups.add(group);
+        } else {
+            System.out.println("Group is already owned by the user.");
+        }
+    }
+
+    // Remove a group from the owned groups
+    public void removeOwnedGroup(Group group) {
+        if (ownedGroups.contains(group)) {
+            ownedGroups.remove(group);
+        } else {
+            System.out.println("Group is not owned by the user.");
+        }
+    }
+
+    public void setOwnedGroups(List<Group> ownedGroups) {
+        this.ownedGroups = ownedGroups;
+    }
+
+    public void setJoinedGroups(List<Group> joinedGroups) {
+        this.joinedGroups = joinedGroups;
+    }
+    
+
+    public List<Group> getOwnedGroups() {
+        return ownedGroups;
+    }
+    
+    public List<Group> getJoinedGroups() {
+        return joinedGroups;
+    }
+    
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void addNotification(Notification notification)
+    {
+        if (!notifications.contains(notification)) {
+            notifications.add(notification);
+        } else {
+            System.out.println("Group is already owned by the user.");
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Same instance in memory
+        if (obj == null || getClass() != obj.getClass()) return false; // Not null and both are of the same class
+        User user = (User) obj;
+        return userId != null && userId.equals(user.userId); // this.userId is not null and equals that of the user
+    }
+
+    // Equal objects must have the same HashCode
+    @Override
+    public int hashCode() {
+        return userId != null ? userId.hashCode() : 0; // Ensure that two strings with the same characters have the same hash code.
     }
 
 }
