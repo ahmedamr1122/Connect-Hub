@@ -6,6 +6,7 @@ import java.util.List;
 import Backend.content.Post;
 import Backend.content.Story;
 import Backend.friends.FriendRequest;
+import Backend.notification.Notification;
 import java.util.ArrayList;
 
 // Class to represent a user
@@ -28,6 +29,8 @@ public class User {
     private List<FriendRequest> receivedRequests;
     private List<Group> ownedGroups;
     private List<Group> joinedGroups;
+    private List<Notification> notifications;
+    
 
     public User(String userId, String email, String username, String password, LocalDate dateOfBirth, Status status, String bio, String profilePhoto, String coverPhoto) {
         this.userId = userId;
@@ -47,6 +50,7 @@ public class User {
         this.sentRequests = new ArrayList<>();
         this.ownedGroups = new ArrayList<>();
         this.joinedGroups = new ArrayList<>();
+        this.notifications = new ArrayList<>();
 
     }
 
@@ -68,6 +72,7 @@ public class User {
         this.sentRequests = new ArrayList<>();
         this.ownedGroups = new ArrayList<>();
         this.joinedGroups = new ArrayList<>();
+        this.notifications = new ArrayList<>();
 
     }
 
@@ -235,6 +240,19 @@ public class User {
     
     public List<Group> getJoinedGroups() {
         return joinedGroups;
+    }
+    
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void addNotification(Notification notification)
+    {
+        if (!notifications.contains(notification)) {
+            notifications.add(notification);
+        } else {
+            System.out.println("Group is already owned by the user.");
+        }
     }
 
     @Override
