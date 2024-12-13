@@ -1,5 +1,6 @@
 package Backend.friends;
 
+import Backend.notification.NotificationService;
 import Backend.user.FileManagement;
 import Backend.user.FindUser;
 import Backend.user.User;
@@ -27,7 +28,7 @@ public class FriendManagerImplement implements FriendManager {
     }*/
     @Override
     public void sendFriendRequest(User sender, User receiver, List<User> users) {
-
+        NotificationService notificationService = NotificationService.getInstance();
         FriendRequest request = new FriendRequest(sender.getUserId(), receiver.getUserId(), RequestStatus.PENDING);
 
         if (fileManagement == null) {
@@ -50,6 +51,7 @@ public class FriendManagerImplement implements FriendManager {
         // Add the friend request to both sender and receiver
         sender.getSentRequests().add(request);
         receiver.getReceivedRequests().add(request);
+        notificationService.sendFriendRequestNotification(sender, receiver);
 
         // Save users to persistent storage
         fileManagement.saveUsers(users);
@@ -74,6 +76,7 @@ public class FriendManagerImplement implements FriendManager {
         // Find the friend request
         FriendRequest request1 = FriendRequest.findSentRequest(sender, receiver);
         FriendRequest request2 = FriendRequest.findReceivedRequest(receiver, sender);
+        NotificationService notificationService = NotificationService.getInstance();
 
         if (request1 == null && request2 == null) {
             return; // Exit if no friend request exists
@@ -84,6 +87,7 @@ public class FriendManagerImplement implements FriendManager {
             if (!sender.getFriends().contains(receiver)) {
                 sender.getFriends().add(receiver);
                 receiver.getFriends().add(sender);
+                notificationService.sendFriendRequestStatusNotification(sender, receiver, RequestStatus.ACCEPTED);
 
             }
         }
@@ -91,6 +95,7 @@ public class FriendManagerImplement implements FriendManager {
         // Remove the friend request from sender and receiver
         sender.getSentRequests().remove(request1);
         receiver.getReceivedRequests().remove(request2);
+        notificationService.sendFriendRequestStatusNotification(sender, receiver, RequestStatus.DECLINED);
 
         // Save users to file
         try {

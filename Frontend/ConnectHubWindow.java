@@ -5,6 +5,10 @@
 package Frontend;
 
 import Backend.Friends.BlockManagerImplement;
+import Backend.Group.FindGroup;
+import Backend.Group.Group;
+import Backend.Group.UserGroupRole;
+import Backend.Group.groupService;
 import Backend.content.ContentService;
 import Backend.content.Post;
 import Backend.content.Story;
@@ -13,7 +17,9 @@ import Backend.friends.FriendManager;
 import Backend.friends.FriendManagerImplement;
 import Backend.friends.FriendRequest;
 import Backend.friends.RequestStatus;
+import Backend.notification.NotificationService;
 import Backend.profile.ProfileUpdater;
+import Backend.search.SearchService;
 import Backend.user.FileManagement;
 import Backend.user.FindUser;
 import Backend.user.Login;
@@ -35,6 +41,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -46,6 +54,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -53,6 +62,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 /**
@@ -73,6 +83,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private FileManagement fileManagement;
     private ProfileUpdater profileUpdater;
     private FindUser findUser;
+    private DefaultListModel listModel;
+    private groupService groupsrvc;
 
     public ConnectHubWindow() {
         initComponents();
@@ -80,6 +92,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         userManagement = new UserAccountManagement();
         fileManagement = FileManagement.getInstance();
         blockManager = BlockManagerImplement.getInstance();
+        groupsrvc = groupService.getInstance();
         findUser = new FindUser();
 
         List<User> loadedUsers = fileManagement.loadUsers();
@@ -90,6 +103,16 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         userManagement.displayUsers();
 
+        listModel = new DefaultListModel();
+        searchList.setModel(listModel);
+        
+        searchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+// Add searchList to the JPopupMenu
+        menue.add(new JScrollPane(searchList));
+        initializeSearchComponents();
+
+        //menue.add(searchResultsPanel);
         /*
         
         try {
@@ -109,6 +132,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        searchResultsPanel = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        searchList = new javax.swing.JList<>();
+        menue = new javax.swing.JPopupMenu();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         kGradientPanel1 = new keeptoo.KGradientPanel();
         kGradientPanel2 = new keeptoo.KGradientPanel();
@@ -136,6 +163,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         pfp = new javax.swing.JLabel();
         friendManagementButton = new javax.swing.JButton();
         logoutButton = new javax.swing.JButton();
+        notificationLabel = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
+        searchBar = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         kGradientPanel3 = new keeptoo.KGradientPanel();
         postStoryButton = new javax.swing.JButton();
@@ -165,7 +195,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         userPosts = new javax.swing.JScrollPane(userPostPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         userPostPanel = new javax.swing.JPanel();
         uploadPfp = new javax.swing.JButton();
-        removeFriendButton = new javax.swing.JButton();
+        viewUserGroupsButton = new javax.swing.JButton();
         uploadCoverPhoto1 = new javax.swing.JButton();
         updatePass = new javax.swing.JButton();
         updateBio = new javax.swing.JButton();
@@ -173,6 +203,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         backButton = new javax.swing.JButton();
         unBlockUsers1 = new javax.swing.JButton();
         blockUsers2 = new javax.swing.JButton();
+        removeFriendButton1 = new javax.swing.JButton();
         kGradientPanel7 = new keeptoo.KGradientPanel();
         jPanel6 = new javax.swing.JPanel();
         emailTextField1 = new javax.swing.JTextField();
@@ -197,6 +228,42 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         sentReqScroll = new javax.swing.JScrollPane(sentRequestsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         sentRequestsPanel = new javax.swing.JPanel();
         refresh2 = new javax.swing.JLabel();
+        groupSuggestionScroll = new javax.swing.JScrollPane(suggestedFriendsPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        suggestedGroupsPanel = new javax.swing.JPanel();
+        incomingGroupReqScroll = new javax.swing.JScrollPane(receivedRequestsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        receivedGroupRequestsPanel1 = new javax.swing.JPanel();
+        sentGroupReqScroll = new javax.swing.JScrollPane(sentRequestsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        sentGroupRequestsPanel = new javax.swing.JPanel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        kGradientPanel8 = new keeptoo.KGradientPanel();
+        ownedGroupsScrollPanel = new javax.swing.JScrollPane(friendsPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        ownedGroupsPanel = new javax.swing.JPanel();
+        joinedGroupsScrollPanel = new javax.swing.JScrollPane(friendsPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        joinedGroupsPanel = new javax.swing.JPanel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        returnButton1 = new javax.swing.JButton();
+        refresh3 = new javax.swing.JLabel();
+
+        searchList.setBackground(new java.awt.Color(255, 204, 255));
+        searchList.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        searchList.setForeground(new java.awt.Color(51, 0, 51));
+        jScrollPane3.setViewportView(searchList);
+
+        javax.swing.GroupLayout searchResultsPanelLayout = new javax.swing.GroupLayout(searchResultsPanel);
+        searchResultsPanel.setLayout(searchResultsPanelLayout);
+        searchResultsPanelLayout.setHorizontalGroup(
+            searchResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+        );
+        searchResultsPanelLayout.setVerticalGroup(
+            searchResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+        );
+
+        menue.setFocusable(false);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -326,14 +393,14 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             .addGap(0, 900, Short.MAX_VALUE)
             .addGroup(kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addGap(0, 7, Short.MAX_VALUE)
                     .addComponent(kGradientPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         kGradientPanel1Layout.setVerticalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 555, Short.MAX_VALUE)
             .addGroup(kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(kGradientPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(kGradientPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("tab1", kGradientPanel1);
@@ -367,7 +434,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(296, 296, 296)
                 .addComponent(addPostButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(300, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -379,12 +446,12 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 650, 470));
+        kGradientPanel4.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 60, 650, 470));
 
         StoriesPanel.setBackground(new java.awt.Color(255, 204, 255));
         jScrollPane1.setViewportView(StoriesPanel);
 
-        kGradientPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, -6, 510, 70));
+        kGradientPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, -10, 510, 70));
 
         jPanel3.setBackground(new java.awt.Color(0, 0, 0));
 
@@ -414,7 +481,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 .addGap(16, 16, 16))
         );
 
-        kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 0, 150, 60));
+        kGradientPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 0, 150, 60));
 
         refresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/refresh2.png"))); // NOI18N
         refresh.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -430,18 +497,18 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 pfpMouseClicked(evt);
             }
         });
-        kGradientPanel4.add(pfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 10, -1, -1));
+        kGradientPanel4.add(pfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 10, -1, -1));
 
         friendManagementButton.setBackground(new java.awt.Color(255, 204, 255));
         friendManagementButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         friendManagementButton.setForeground(new java.awt.Color(51, 0, 51));
-        friendManagementButton.setText("Friend Management");
+        friendManagementButton.setText("Social Management");
         friendManagementButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 friendManagementButtonActionPerformed(evt);
             }
         });
-        kGradientPanel4.add(friendManagementButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 460, -1, 60));
+        kGradientPanel4.add(friendManagementButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 460, 150, 60));
 
         logoutButton.setBackground(new java.awt.Color(255, 255, 255));
         logoutButton.setForeground(new java.awt.Color(51, 0, 51));
@@ -451,7 +518,28 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                 logoutButtonActionPerformed(evt);
             }
         });
-        kGradientPanel4.add(logoutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 480, -1, -1));
+        kGradientPanel4.add(logoutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 490, -1, -1));
+
+        notificationLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/NotificationResize.png"))); // NOI18N
+        notificationLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                notificationLabelMouseClicked(evt);
+            }
+        });
+        kGradientPanel4.add(notificationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, -1, -1));
+
+        jLabel31.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel31.setText("Search");
+        kGradientPanel4.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 56, 70, 20));
+
+        searchBar.setBackground(new java.awt.Color(255, 255, 255));
+        searchBar.setForeground(new java.awt.Color(51, 0, 51));
+        searchBar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                searchBarKeyReleased(evt);
+            }
+        });
+        kGradientPanel4.add(searchBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 170, -1));
 
         jTabbedPane2.addTab("tab3", kGradientPanel4);
 
@@ -739,15 +827,15 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         });
         kGradientPanel6.add(uploadPfp, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 210, 150, -1));
 
-        removeFriendButton.setBackground(new java.awt.Color(255, 204, 255));
-        removeFriendButton.setForeground(new java.awt.Color(51, 0, 51));
-        removeFriendButton.setText("Remove Friend");
-        removeFriendButton.addActionListener(new java.awt.event.ActionListener() {
+        viewUserGroupsButton.setBackground(new java.awt.Color(255, 204, 255));
+        viewUserGroupsButton.setForeground(new java.awt.Color(51, 0, 51));
+        viewUserGroupsButton.setText("View Your Groups");
+        viewUserGroupsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeFriendButtonActionPerformed(evt);
+                viewUserGroupsButtonActionPerformed(evt);
             }
         });
-        kGradientPanel6.add(removeFriendButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 370, 130, -1));
+        kGradientPanel6.add(viewUserGroupsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 340, 130, -1));
 
         uploadCoverPhoto1.setBackground(new java.awt.Color(255, 204, 255));
         uploadCoverPhoto1.setForeground(new java.awt.Color(51, 0, 51));
@@ -812,6 +900,16 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             }
         });
         kGradientPanel6.add(blockUsers2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, 130, -1));
+
+        removeFriendButton1.setBackground(new java.awt.Color(255, 204, 255));
+        removeFriendButton1.setForeground(new java.awt.Color(51, 0, 51));
+        removeFriendButton1.setText("Remove Friend");
+        removeFriendButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeFriendButton1ActionPerformed(evt);
+            }
+        });
+        kGradientPanel6.add(removeFriendButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 370, 130, -1));
 
         jTabbedPane2.addTab("tab5", kGradientPanel6);
 
@@ -971,11 +1069,11 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         jLabel23.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(51, 0, 51));
-        jLabel23.setText("Sent Requests");
+        jLabel23.setText("Sent Friend Requests");
 
         jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(51, 0, 51));
-        jLabel25.setText("Incoming Requests");
+        jLabel25.setText("Incoming Friend Requests");
 
         returnButton.setBackground(new java.awt.Color(51, 0, 51));
         returnButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -1002,25 +1100,71 @@ public class ConnectHubWindow extends javax.swing.JFrame {
             }
         });
 
+        groupSuggestionScroll.setPreferredSize(new java.awt.Dimension(300, 40));
+
+        suggestedGroupsPanel.setBackground(new java.awt.Color(255, 204, 255));
+        suggestedGroupsPanel.setPreferredSize(new java.awt.Dimension(300, 40));
+        suggestedGroupsPanel.setLayout(new javax.swing.BoxLayout(suggestedGroupsPanel, javax.swing.BoxLayout.Y_AXIS));
+        groupSuggestionScroll.setViewportView(suggestedGroupsPanel);
+
+        receivedGroupRequestsPanel1.setBackground(new java.awt.Color(255, 204, 255));
+        receivedGroupRequestsPanel1.setLayout(new javax.swing.BoxLayout(receivedGroupRequestsPanel1, javax.swing.BoxLayout.Y_AXIS));
+        incomingGroupReqScroll.setViewportView(receivedGroupRequestsPanel1);
+
+        sentGroupRequestsPanel.setBackground(new java.awt.Color(255, 204, 255));
+        sentGroupRequestsPanel.setLayout(new javax.swing.BoxLayout(sentGroupRequestsPanel, javax.swing.BoxLayout.Y_AXIS));
+        sentGroupReqScroll.setViewportView(sentGroupRequestsPanel);
+
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel26.setText("Sent Group Requests");
+
+        jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel27.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel27.setText("Incoming Group Invitations");
+
+        jLabel28.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel28.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel28.setText("Group Suggestions");
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-                        .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(67, 67, 67))
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(incomingReqScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel25)
+                                .addGap(34, 34, 34)))
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel23)
+                            .addComponent(sentReqScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(groupSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGap(23, 23, 23)
+                                .addComponent(jLabel28)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(incomingReqScroll)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel23)
-                    .addComponent(sentReqScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addComponent(jLabel27, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(20, 20, 20))
+                            .addComponent(incomingGroupReqScroll))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sentGroupReqScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel26))))
                 .addGap(106, 106, 106)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1034,24 +1178,35 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16))
-            .addGroup(jPanel7Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(refresh2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(refresh2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel23))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                                    .addComponent(incomingReqScroll)
+                                    .addComponent(sentReqScroll))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel23))
+                            .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel26)
+                            .addComponent(jLabel28))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(friendSuggestionScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(incomingReqScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
-                            .addComponent(sentReqScroll))))
-                .addGap(0, 163, Short.MAX_VALUE))
+                            .addComponent(groupSuggestionScroll, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(incomingGroupReqScroll)
+                            .addComponent(sentGroupReqScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGap(0, 490, Short.MAX_VALUE)
+                        .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(16, 16, 16))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel7Layout.createSequentialGroup()
                     .addGap(16, 16, 16)
@@ -1060,6 +1215,87 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         );
 
         jTabbedPane2.addTab("tab7", jPanel7);
+
+        kGradientPanel8.setkEndColor(new java.awt.Color(255, 204, 255));
+        kGradientPanel8.setkStartColor(new java.awt.Color(51, 0, 51));
+
+        ownedGroupsPanel.setBackground(new java.awt.Color(255, 255, 255));
+        ownedGroupsPanel.setLayout(new javax.swing.BoxLayout(ownedGroupsPanel, javax.swing.BoxLayout.Y_AXIS));
+        ownedGroupsScrollPanel.setViewportView(ownedGroupsPanel);
+
+        joinedGroupsPanel.setBackground(new java.awt.Color(255, 255, 255));
+        joinedGroupsPanel.setLayout(new javax.swing.BoxLayout(joinedGroupsPanel, javax.swing.BoxLayout.Y_AXIS));
+        joinedGroupsScrollPanel.setViewportView(joinedGroupsPanel);
+
+        jLabel29.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel29.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel29.setText("Joined Groups");
+
+        jLabel30.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel30.setForeground(new java.awt.Color(51, 0, 51));
+        jLabel30.setText("Owned Groups");
+
+        returnButton1.setBackground(new java.awt.Color(51, 0, 51));
+        returnButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        returnButton1.setForeground(new java.awt.Color(255, 204, 255));
+        returnButton1.setText("Return");
+        returnButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                returnButton1ActionPerformed(evt);
+            }
+        });
+
+        refresh3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Frontend/refresh2.png"))); // NOI18N
+        refresh3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                refresh3MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout kGradientPanel8Layout = new javax.swing.GroupLayout(kGradientPanel8);
+        kGradientPanel8.setLayout(kGradientPanel8Layout);
+        kGradientPanel8Layout.setHorizontalGroup(
+            kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kGradientPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(kGradientPanel8Layout.createSequentialGroup()
+                        .addComponent(returnButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel8Layout.createSequentialGroup()
+                        .addGap(0, 175, Short.MAX_VALUE)
+                        .addGroup(kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(ownedGroupsScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel30))
+                        .addGap(29, 29, 29)
+                        .addGroup(kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(kGradientPanel8Layout.createSequentialGroup()
+                                .addComponent(jLabel29)
+                                .addGap(270, 270, 270)
+                                .addComponent(refresh3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(joinedGroupsScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
+        );
+        kGradientPanel8Layout.setVerticalGroup(
+            kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kGradientPanel8Layout.createSequentialGroup()
+                .addComponent(refresh3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(returnButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28))
+            .addGroup(kGradientPanel8Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel30, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(kGradientPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ownedGroupsScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(joinedGroupsScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(199, Short.MAX_VALUE))
+        );
+
+        jTabbedPane2.addTab("tab8", kGradientPanel8);
 
         getContentPane().add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 590));
 
@@ -1136,6 +1372,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_refreshMouseClicked
 
     private void pfpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pfpMouseClicked
+        load();
         jTabbedPane2.setSelectedIndex(4);
         displayFriendsList(currentUser);
         bioLabel.setText(currentUser.getBio().trim());
@@ -1163,12 +1400,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         fileManagement.saveUsers(userManagement.getUsers());
     }//GEN-LAST:event_uploadPfpActionPerformed
 
-    private void removeFriendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFriendButtonActionPerformed
-        load();
-        handleRemoveFriend();
-        fileManagement.saveUsers(userManagement.getUsers());
+    private void viewUserGroupsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewUserGroupsButtonActionPerformed
 
-    }//GEN-LAST:event_removeFriendButtonActionPerformed
+
+    }//GEN-LAST:event_viewUserGroupsButtonActionPerformed
 
     private void uploadCoverPhoto1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadCoverPhoto1ActionPerformed
         load();
@@ -1242,6 +1477,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_friendManagementButtonActionPerformed
 
     private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        load();
         Logout logout = new Logout();
         User user = findUser.findUserById(currentUser.getUserId(), userManagement.getUsers());
         logout.logout(user, userManagement.getUsers());
@@ -1258,8 +1494,237 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_refresh2MouseClicked
 
     private void blockUsers2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blockUsers2ActionPerformed
-        // TODO add your handling code here:
+        load();
+        handleUnBlockUser();
+        fileManagement.saveUsers(userManagement.getUsers());
     }//GEN-LAST:event_blockUsers2ActionPerformed
+
+    private void removeFriendButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFriendButton1ActionPerformed
+        load();
+        String friendUsername = JOptionPane.showInputDialog(this,
+                "Enter the username of the friend to remove:",
+                "Remove Friend",
+                JOptionPane.PLAIN_MESSAGE);
+
+        // Validate input
+        if (friendUsername == null || friendUsername.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Friend's username cannot be empty.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        removeFriend(friendUsername);
+        fileManagement.saveUsers(userManagement.getUsers());
+    }//GEN-LAST:event_removeFriendButton1ActionPerformed
+
+    private void returnButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_returnButton1ActionPerformed
+
+    private void refresh3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refresh3MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_refresh3MouseClicked
+
+    private void notificationLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notificationLabelMouseClicked
+        new NotificationWindow(currentUser, userManagement.getUsers()).setVisible(true);
+    }//GEN-LAST:event_notificationLabelMouseClicked
+
+    private void searchBarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBarKeyReleased
+        String search = searchBar.getText().trim();
+
+        if (!search.equals("")) {
+            listModel.removeAllElements();
+            List<User> matchingUsers = SearchService.getInstance().searchUsers(search, userManagement.getUsers(), currentUser.getBlocked(), currentUser);
+            List<Group> matchingGroups = SearchService.getInstance().searchGroups(search, groupsrvc.getAllGroups());
+
+            // Clear and populate the list model with search results
+            listModel.clear();
+            for (User user : matchingUsers) {
+                listModel.addElement("User: " + user.getUsername());
+            }
+            for (Group group : matchingGroups) {
+                listModel.addElement("Group: " + group.getGroupId());
+            }
+
+            if (listModel.isEmpty()) {
+                listModel.addElement("No results found");
+            }
+        }
+
+        menue.show(searchBar, 0, searchBar.getHeight());
+    }//GEN-LAST:event_searchBarKeyReleased
+
+    private void initializeSearchComponents() {
+        searchList.setModel(listModel);
+        searchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Add mouse listener to handle selection
+        searchList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Double-click to select
+                    int index = searchList.locationToIndex(e.getPoint());
+                    String selectedValue = searchList.getModel().getElementAt(index);
+                    handleSelection(selectedValue);
+                    menue.setVisible(false); // Hide the popup menu after selection
+                }
+            }
+        });
+    }
+
+    private void handleSelection(String selectedValue) {
+        if (selectedValue.startsWith("User: ")) {
+            String username = selectedValue.substring(6); // Extract username
+            User selectedUser = findUser.findUserByUsername(username, userManagement.getUsers());
+            FriendManager friendManager = FriendManagerImplement.getInstance();
+            List<User> suggestedFriends = friendManager.suggestFriends(currentUser, userManagement.getUsers());
+
+            // Show user-specific options
+            Object[] options = {"Add Friend", "Remove Friend", "Block User", "View Profile"};
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Choose an action for " + username + ":",
+                    "User Actions",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            // Execute the chosen action
+            switch (choice) {
+                case 0: // Add Friend
+                    handleAddFriend(selectedUser, suggestedFriends);
+                    break;
+                case 1: // Remove Friend
+                    handleRemoveFriend(selectedUser);
+                    break;
+                case 2: // Block User
+                    handleBlockUsers(selectedUser);
+                    break;
+                case 3: // View Profile
+                    handleViewProfile(selectedUser);
+                    break;
+                default:
+                    break;
+            }
+        } else if (selectedValue.startsWith("Group: ")) {
+            String groupId = selectedValue.substring(7); // Extract group name
+            UserGroupRole userGroupRole = UserGroupRole.getInstance();
+
+            // Show group-specific options
+            Object[] options = {"Join Group", "Leave Group", "View Group"};
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Choose an action for " + groupId + ":",
+                    "Group Actions",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            // Execute the chosen action
+            switch (choice) {
+                case 0: // Join Group
+                    handleJoinGroup(groupId, userGroupRole);
+                    break;
+                case 1: // Leave Group
+                    handleLeaveGroup(groupId, userGroupRole);
+                    break;
+                case 2: // View Group
+                    handleViewGroup(groupId);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No valid selection.");
+        }
+    }
+
+    private void handleAddFriend(User selectedUser, List<User> suggestedFriends) {
+        if (suggestedFriends.contains(selectedUser)) {
+            sendFriendRequest(selectedUser);
+            JOptionPane.showMessageDialog(this, "Friend request sent to " + selectedUser.getUsername() + ".");
+        } else if (currentUser.getFriends(userManagement.getUsers()).contains(selectedUser)) {
+            JOptionPane.showMessageDialog(this, "This user is already your friend.");
+        } else if (currentUser.getBlocked(userManagement.getUsers()).contains(selectedUser)) {
+            JOptionPane.showMessageDialog(this, "You cannot add this user as they are blocked.");
+        } else {
+            JOptionPane.showMessageDialog(this, "This user is not in your suggested friends list.");
+        }
+    }
+
+    private void handleRemoveFriend(User selectedUser) {
+        String friendUsername = selectedUser.getUsername();
+        removeFriend(friendUsername);
+        /*if (currentUser.getFriends(userManagement.getUsers()).contains(selectedUser)) {
+            removeFriend(friendUsername);
+            JOptionPane.showMessageDialog(this, "Friend removed: " + selectedUser.getUsername());
+        } else {
+            JOptionPane.showMessageDialog(this, "This user is not your friend.");
+        }*/
+    }
+
+    private void handleBlockUsers(User selectedUser) {
+        if (currentUser.getBlocked(userManagement.getUsers()).contains(selectedUser)) {
+            JOptionPane.showMessageDialog(this, "This user is already blocked.");
+        } else {
+            try {
+                blockManager.block(currentUser, selectedUser, userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
+                JOptionPane.showMessageDialog(this, "User " + selectedUser.getUsername() + " has been blocked.",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Optionally refresh the UI or friends list
+                refreshFriendsList(); // Assuming you have a method to refresh the friends list display
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error while blocking user: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void handleViewProfile(User selectedUser) {
+        //viewUserProfile(selectedUser);
+    }
+
+    private void handleJoinGroup(String groupId, UserGroupRole userGroupRole) {
+        Group group = FindGroup.findGroupById(groupId);
+        if (group.isMember(currentUser)) {
+            JOptionPane.showMessageDialog(this, "You are already a member of this group.");
+        } else if (group.getPendingJoinRequests().stream().anyMatch(req -> req.getUser().equals(currentUser.getUserId()))) {
+            JOptionPane.showMessageDialog(this, "You already have a pending join request for this group.");
+        } else {
+            try {
+                userGroupRole.sendJoinRequest(currentUser, group);
+                JOptionPane.showMessageDialog(this, "Join request sent for the group: " + groupId);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+            }
+        }
+    }
+
+    private void handleLeaveGroup(String groupId, UserGroupRole userGroupRole) {
+        Group group = FindGroup.findGroupById(groupId);
+        if (!group.isMember(currentUser)) {
+            JOptionPane.showMessageDialog(this, "You are not a member of this group.");
+        } else {
+            try {
+                userGroupRole.leaveGroup(group, currentUser);
+                JOptionPane.showMessageDialog(this, "You have left the group: " + groupId);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+            }
+        }
+    }
+
+    private void handleViewGroup(String groupName) {
+        //viewGroup(groupName);
+    }
 
     private void handleLogin() {
         String email = emailTextField.getText().trim();
@@ -1391,7 +1856,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         // Perform blocking
         try {
-            blockManager.block(currentUser, userToBlock,userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
+            blockManager.block(currentUser, userToBlock, userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
             JOptionPane.showMessageDialog(this, "User " + userToBlock.getUsername() + " has been blocked.",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
 
@@ -1402,7 +1867,8 @@ public class ConnectHubWindow extends javax.swing.JFrame {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-        private void handleUnBlockUser() {
+
+    private void handleUnBlockUser() {
         String userToUnBlockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:",
                 "Block User", JOptionPane.PLAIN_MESSAGE);
 
@@ -1422,7 +1888,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
 
         // Perform blocking
         try {
-            blockManager.unBlock(currentUser, userToUnBlock,userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
+            blockManager.unBlock(currentUser, userToUnBlock, userManagement.getUsers()); // Assuming `currentUser` is the logged-in user
             JOptionPane.showMessageDialog(this, "User " + userToUnBlock.getUsername() + " has been unblocked.",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
 
@@ -1434,23 +1900,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
     }
 
-    private void handleRemoveFriend() {
-        String friendUsername = JOptionPane.showInputDialog(this,
-                "Enter the username of the friend to remove:",
-                "Remove Friend",
-                JOptionPane.PLAIN_MESSAGE);
-
-        // Validate input
-        if (friendUsername == null || friendUsername.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Friend's username cannot be empty.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    private void removeFriend(String friendUsername) {
 
         // Find the friend in the current user's friend list
-       User friendToRemove = null;
+        User friendToRemove = null;
         for (User friend : currentUser.getFriends()) {
 
             User user1 = findUser.findUserById(friend.getUserId(), userManagement.getUsers());
@@ -1645,7 +2098,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     }
 
     private void respondToRequest(User sender, FriendRequest request, RequestStatus response) {
-       
+
         User user = currentUser;
         if (response == RequestStatus.ACCEPTED) {
             // Accept the friend request
@@ -1665,8 +2118,7 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         }
         currentUser = user;
         // Refresh the list of incoming requests
-       // currentUser.getReceivedRequests().remove(request);
-       
+        // currentUser.getReceivedRequests().remove(request);
 
         showIncomingRequests();  // This refreshes the UI to remove the request or show the updated status
     }
@@ -1757,6 +2209,13 @@ public class ConnectHubWindow extends javax.swing.JFrame {
         ImagePreview2.setIcon(null);
         ImagePreview2.setText("No image selected");
         selectedImagePath = null;
+
+        NotificationService notificationService = NotificationService.getInstance();
+        String currentUserName = currentUser.getUsername();
+        for (User friend : currentUser.getFriends()) {
+            notificationService.sendNewsfeedPostNotification(friend, currentUserName);
+        }
+
         refreshNewsfeed();
         displayUserPosts(currentUser);
 
@@ -2045,7 +2504,9 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JScrollPane friendSuggestionScroll;
     private javax.swing.JPanel friendsPanel;
     private javax.swing.JScrollPane friendsScrollPanel;
+    private javax.swing.JScrollPane groupSuggestionScroll;
     private javax.swing.JLabel imagePreview;
+    private javax.swing.JScrollPane incomingGroupReqScroll;
     private javax.swing.JScrollPane incomingReqScroll;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2064,7 +2525,13 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -2080,7 +2547,10 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JPanel joinedGroupsPanel;
+    private javax.swing.JScrollPane joinedGroupsScrollPanel;
     private keeptoo.KGradientPanel kGradientPanel1;
     private keeptoo.KGradientPanel kGradientPanel2;
     private keeptoo.KGradientPanel kGradientPanel3;
@@ -2088,8 +2558,13 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private keeptoo.KGradientPanel kGradientPanel5;
     private keeptoo.KGradientPanel kGradientPanel6;
     private keeptoo.KGradientPanel kGradientPanel7;
+    private keeptoo.KGradientPanel kGradientPanel8;
     private javax.swing.JButton loginButton;
     private javax.swing.JButton logoutButton;
+    private javax.swing.JPopupMenu menue;
+    private javax.swing.JLabel notificationLabel;
+    private javax.swing.JPanel ownedGroupsPanel;
+    private javax.swing.JScrollPane ownedGroupsScrollPanel;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JPasswordField passwordField1;
     private javax.swing.JLabel pfp;
@@ -2098,17 +2573,26 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JButton postPostButton;
     private javax.swing.JButton postStoryButton;
     private javax.swing.JLabel profilePicLabel;
+    private javax.swing.JPanel receivedGroupRequestsPanel1;
     private javax.swing.JPanel receivedRequestsPanel;
     private javax.swing.JLabel refresh;
     private javax.swing.JLabel refresh2;
-    private javax.swing.JButton removeFriendButton;
+    private javax.swing.JLabel refresh3;
+    private javax.swing.JButton removeFriendButton1;
     private javax.swing.JButton returnButton;
+    private javax.swing.JButton returnButton1;
+    private javax.swing.JTextField searchBar;
+    private javax.swing.JList<String> searchList;
+    private javax.swing.JPanel searchResultsPanel;
+    private javax.swing.JScrollPane sentGroupReqScroll;
+    private javax.swing.JPanel sentGroupRequestsPanel;
     private javax.swing.JScrollPane sentReqScroll;
     private javax.swing.JPanel sentRequestsPanel;
     private javax.swing.JButton signUpButton;
     private javax.swing.JLabel signinLabel;
     private javax.swing.JTextField storyCaptionTextField;
     private javax.swing.JPanel suggestedFriendsPanel;
+    private javax.swing.JPanel suggestedGroupsPanel;
     private javax.swing.JButton unBlockUsers1;
     private javax.swing.JButton updateBio;
     private javax.swing.JButton updatePass;
@@ -2119,5 +2603,6 @@ public class ConnectHubWindow extends javax.swing.JFrame {
     private javax.swing.JPanel userPostPanel;
     private javax.swing.JScrollPane userPosts;
     private javax.swing.JTextField usernameTextField;
+    private javax.swing.JButton viewUserGroupsButton;
     // End of variables declaration//GEN-END:variables
 }
