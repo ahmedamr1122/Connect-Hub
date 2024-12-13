@@ -53,7 +53,7 @@ public class BlockManagerImplement implements BlockManager {
 
     @Override
     public void unBlock(User blocker, User blocked, List<User> users) {
-        List <User> blockedList1 = blocker.getFriends(users);
+        List <User> blockedList1 = blocker.getBlocked(users);
         if (blockedList1.contains(blocked)) {
             blockedList1.remove(blocked);
             blocker.setBlocked(blockedList1);
